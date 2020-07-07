@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from 'jquery'
 import {Button, Col, Row, Space, Table, Tag, notification, Radio} from "antd";
 
 class Head extends React.Component {
@@ -9,31 +10,33 @@ class Head extends React.Component {
             gender: "",
             bed: "",
             age: "",
+            api: global.constants.nhisApi
         };
     }
 
     componentDidMount() {
 
-        console.log("head"+this.props.name);
+        console.log("head"+this.props.pkPv);
+        console.log("api"+global.constants.nhisApi);
+        this.serverRequest = $.get(global.constants.nhisApi+"/nhis/mobile/patient?pkPv="+this.props.pkPv, function (result) {
+            console.log(result);
+            if(result.code==400){
+                notification.open({
+                    message: '提示',
+                    description: result.msg,
+                });
+            }
+            if(result.code==200){
 
-        // this.serverRequest = $.get(global.patientInfo+"/nhis/mobile/patient?pkPv="+document.getElementById('id').innerText, function (result) {
-        //     console.log(result);
-        //     if(result.code==400){
-        //         notification.open({
-        //             message: '提示',
-        //             description: result.msg,
-        //         });
-        //     }
-        //     if(result.code==200){
-        //         this.setState({
-        //             name: result.data.namePi,
-        //             gender: result.data.gender,
-        //             bed: result.data.bedNo,
-        //             age: result.data.agePv,
-        //         });
-        //     }
-        //
-        // }.bind(this));
+                this.setState({
+                    name: result.data.namePi,
+                    gender: result.data.gender,
+                    bed: result.data.bedNo,
+                    age: result.data.agePv,
+                });
+            }
+
+        }.bind(this));
 
     }
 

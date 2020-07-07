@@ -2,6 +2,7 @@ import React from 'react';
 import {Button, Col, Row, Space, Table, Tag, notification, Radio} from "antd";
 import $ from 'jquery'
 import Head from "../common/head";
+import {Link} from "react-router-dom";
 
 const columns = [
     {
@@ -129,7 +130,8 @@ class Home extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
-            name: this.props.match.params.pkPv,
+            pkPv: this.props.match.params.pkPv,
+            name: "",
             gender: "",
             bed: "",
             age: "",
@@ -140,48 +142,29 @@ class Home extends React.Component{
     componentDidMount() {
         console.log("url中获取的参数"+this.props.match.params.pkPv);
 
-
-        // this.serverRequest = $.get(global.patientInfo+"nhis/mobile/patient?pkPv="+document.getElementById('id').innerText, function (result) {
-        //     console.log(result);
-        //     if(result.code==400){
-        //         notification.open({
-        //             message: '提示',
-        //             description: result.msg,
-        //         });
-        //     }
-        //     if(result.code==200){
-        //         this.setState({
-        //             name: result.data.namePi,
-        //             gender: result.data.gender,
-        //             bed: result.data.bedNo,
-        //             age: result.data.agePv,
-        //         });
-        //     }
-        //
-        // }.bind(this));
-        // this.listPatientOrder();
+        this.listPatientOrder();
     }
 
     componentWillUnmount() {
-        // this.serverRequest.abort();
+        this.serverRequest.abort();
     }
 
     listPatientOrder(){
-        // this.serverRequest = $.get(global.patientInfo+"/nhis/mobile/ord?pkPv="+document.getElementById('id').innerText, function (result) {
-        //     console.log(result);
-        //     if(result.code==400){
-        //         notification.open({
-        //             message: '提示',
-        //             description: result.msg,
-        //         });
-        //     }
-        //     if(result.code==200){
-        //         this.setState({
-        //             tableData: result.data
-        //         });
-        //     }
-        //
-        // }.bind(this));
+        this.serverRequest = $.get(global.constants.nhisApi+"/nhis/mobile/ord?pkPv="+this.props.match.params.pkPv, function (result) {
+            console.log(result);
+            if(result.code==400){
+                notification.open({
+                    message: '提示',
+                    description: result.msg,
+                });
+            }
+            if(result.code==200){
+                this.setState({
+                    tableData: result.data
+                });
+            }
+
+        }.bind(this));
     }
 
     // 跳转到医嘱界面
@@ -194,7 +177,7 @@ class Home extends React.Component{
         return (
             <div style={{margin: 20}}>
 
-                <Head name={this.state.name}/>
+                <Head pkPv={this.state.pkPv}/>
 
                 <div>
                     <Row>
@@ -219,7 +202,7 @@ class Home extends React.Component{
 
                         <Col span={12}>
                             <div>
-                                <Button type="primary" style={{marginLeft:20}} onClick={this.toMedicalAdvice}>新医嘱</Button>
+                                <Button type="primary" style={{marginLeft:20}}><Link to={"/medicalAdvice/"+this.props.match.params.pkPv}>新医嘱</Link></Button>
                                 <Button type="primary" style={{marginLeft:20}}>停嘱</Button>
                                 <Button type="primary" style={{marginLeft:20}}>签署</Button>
                                 <Button type="primary" style={{marginLeft:20}}>删除</Button>
