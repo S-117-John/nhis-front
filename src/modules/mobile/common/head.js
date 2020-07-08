@@ -19,7 +19,7 @@ class Head extends React.Component {
 
         console.log("head"+this.props.pkPv);
         console.log("api"+global.constants.nhisApi);
-        this.serverRequest = $.get(global.constants.nhisApi+"/nhis/mobile/patient?pkPv="+this.props.pkPv, function (result) {
+        this.serverRequest = $.get(global.constants.nhisApi+"nhis/mobile/patient?pkPv="+this.props.pkPv, function (result) {
             console.log(result);
             if(result.code==400){
                 notification.open({
