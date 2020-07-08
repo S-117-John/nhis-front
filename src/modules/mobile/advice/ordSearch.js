@@ -1,19 +1,19 @@
 import React from "react";
 import $ from 'jquery'
+import {withRouter} from 'react-router-dom';
 import {Button, Col, Input, Popconfirm, Row, Table} from "antd";
+
 
 function confirm(e) {
     console.log(e);
-    window.location.href = "/mobile/drug/index"
+    this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.state.pkPd);
 }
 
 function cancel(e) {
     console.log(e);
 
 }
-const treeData = [];
 
-const data = [];
 const columns = [
     {
         title: '医嘱名称',
@@ -70,23 +70,33 @@ const columns = [
 
 const ordData = [];
 
+
 class OrdSearch extends React.Component{
+
+
+
+
+
+
     constructor(props) {
         super(props);
         this.state = {
-            data: data,
+            data: this.data,
             ordData:ordData,
             searchValue: "",
-        }
+            pkPd:""
+        };
+        confirm = confirm.bind(this);
     }
 
     componentDidMount() {
-        this.listOrd($("#value").text())
+
+        this.listOrd(this.props.value);
 
     }
 
     componentWillUnmount() {
-        this.serverRequest.abort();
+        // this.serverRequest.abort();
     }
 
     onSelect (selectedKeys, info){
@@ -97,7 +107,7 @@ class OrdSearch extends React.Component{
         console.log(value);
         if(value!=""){
             $.ajax({
-                url: "/nhis/mobile/ord/pd/list?spCode="+value,
+                url: global.constants.nhisApi+"/nhis/mobile/ord/pd/list?spCode="+value,
                 dataType: 'json',
                 cache: false,
                 success: function(data) {
@@ -117,7 +127,7 @@ class OrdSearch extends React.Component{
                 <div style={{width:800}}>
                     <Row>
                         <Col span={12}>
-                            <Input id="search" placeholder="Basic usage" />
+                            <Input  ref='search' id="search"  placeholder="Basic usage" />
                         </Col>
                         <Col span={4}>
                             <Button type="primary"  onClick={()=>this.listOrd($("#search").val())}>搜索</Button>
@@ -133,6 +143,15 @@ class OrdSearch extends React.Component{
                 <div style={{marginTop:20}}>
                     <div>
                         <Table
+                            onRow={record => {
+                                return {
+                                    onClick: event => {this.setState({pkPd:record.key})}, // 点击行
+                                    onDoubleClick: event => {},
+                                    onContextMenu: event => {},
+                                    onMouseEnter: event => {}, // 鼠标移入行
+                                    onMouseLeave: event => {},
+                                };
+                            }}
                             bordered
                             columns={columns}
                             dataSource={this.state.ordData}
@@ -146,4 +165,4 @@ class OrdSearch extends React.Component{
     }
 }
 
-export default OrdSearch;
+export default withRouter(OrdSearch);

@@ -4,33 +4,38 @@ import $ from 'jquery'
 import Head from "../common/head";
 import {Link} from "react-router-dom";
 
+
+
+const tableData = [
+    {
+        bdOrdType:{name:''}
+    }
+];
+
 const columns = [
     {
         title: '组',
         dataIndex: 'group',
-        key: 'group',
         width: 50,
         fixed: 'left',
     },
 
     {
         title: '分类',
-        dataIndex: 'classification',
-        key: 'classification',
+        dataIndex: 'bdOrdTypeName',
         width: 60,
         fixed: 'left',
+
     },
     {
         title: '医嘱',
         dataIndex: 'nameOrd',
-        key: 'nameOrd',
         render: text => <a>{text}</a>,
         width: 200,
         fixed: 'left',
     },
     {
         title: '长',
-        key: 'euAlways',
         dataIndex: 'euAlways',
         render: text => {
             let color = text == "0"  ? 'geekblue' : 'green';
@@ -45,10 +50,15 @@ const columns = [
                 </Tag>
             );
         },
+        filters: [
+            { text: '长期', value: '0' },
+            { text: '临时', value: '1' },
+        ],
+        filteredValue: tableData.euAlways || null,
+        onFilter: (value, record) => record.euAlways.includes(value),
     },
     {
         title: '开始时间',
-        key: 'dateStart',
         dataIndex: 'dateStart',
         width: 200,
     },
@@ -56,61 +66,51 @@ const columns = [
     {
         title: '用量',
         dataIndex: 'quan',
-        key: 'quan',
         render: text => <a>{text}</a>,
     },
     {
         title: '用法',
         dataIndex: 'codeSupply',
-        key: 'codeSupply',
         render: text => <a>{text}</a>,
     },
     {
         title: '频次',
         dataIndex: 'codeFreq',
-        key: 'codeFreq',
         render: text => <a>{text}</a>,
     },
     {
         title: '首',
         dataIndex: 'firstNum',
-        key: 'firstNum',
         render: text => <a>{text}</a>,
     },
     {
         title: '停止时间',
         dataIndex: 'dateStop',
-        key: 'dateStop',
         render: text => <a>{text}</a>,
     },
     {
         title: '末',
         dataIndex: 'lastNum',
-        key: 'lastNum',
         render: text => <a>{text}</a>,
     },
     {
         title: '开立人',
         dataIndex: 'nameEmpOrd',
-        key: 'nameEmpOrd',
         render: text => <a>{text}</a>,
     },
     {
         title: '签署',
         dataIndex: 'nameEmpOrd',
-        key: 'nameEmpOrd',
         render: text => <a>{text}</a>,
     },
     {
         title: '停嘱',
         dataIndex: 'nameEmpStop',
-        key: 'nameEmpStop',
         render: text => <a>{text}</a>,
     },
     {
         title: '操作',
         dataIndex: 'action',
-        key: 'action',
         render: (text) => (
             <Space size="middle">
                 <a>详情</a>
@@ -121,7 +121,6 @@ const columns = [
     },
 ];
 
-const tableData = [];
 
 
 
@@ -131,10 +130,6 @@ class Home extends React.Component{
         super(props);
         this.state = {
             pkPv: this.props.match.params.pkPv,
-            name: "",
-            gender: "",
-            bed: "",
-            age: "",
             tableData: tableData,
         };
     }
@@ -167,11 +162,13 @@ class Home extends React.Component{
         }.bind(this));
     }
 
-    // 跳转到医嘱界面
-    toMedicalAdvice(){
-        // global.patientInfo+
-        // window.location.href= "/mobile/advice?id="+document.getElementById('id').innerText;
-    }
+    handleChange = (pagination, filters, sorter) => {
+        console.log('Various parameters', pagination, filters, sorter);
+        this.setState({
+            filteredInfo: filters,
+            sortedInfo: sorter,
+        });
+    };
 
     render() {
         return (
@@ -216,7 +213,9 @@ class Home extends React.Component{
                             dataSource={this.state.tableData}
                             scroll={{ x: 1500,y: 500 }}
                             pagination={ false }
-                            bordered />
+                            bordered
+                            onChange={this.handleChange}
+                            rowKey={(record, index) => index} />
                     </div>
                 </div>
             </div>

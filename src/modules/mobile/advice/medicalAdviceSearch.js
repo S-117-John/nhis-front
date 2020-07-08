@@ -18,7 +18,7 @@ class MedicalAdviceSearch extends React.Component{
                 <Head pkPv={this.props.match.params.pkPv}/>
                 <Tabs defaultActiveKey="1"  tabPosition={"left"}>
                     <TabPane tab="医嘱" key="1">
-                        <OrdSearch/>
+                        <OrdSearch value={this.props.match.params.value} pkPv={this.props.match.params.pkPv}/>
                     </TabPane>
                     <TabPane tab="检查" key="2">
                         Content of Tab Pane 2
