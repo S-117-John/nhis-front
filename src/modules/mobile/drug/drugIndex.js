@@ -83,6 +83,17 @@ function radioGroup(e) {
     this.state.euAlways = e.target.value;
 }
 
+// 医嘱用法
+function listSupply() {
+    $.ajax({
+        url: global.constants.nhisApi+"nhis/mobile/bd/supply",
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            this.setState({listBdSupply: data.data});
+        }.bind(this)
+    });
+}
 
 //保存
 function save(event) {
@@ -115,7 +126,6 @@ function radioGroup(e) {
     console.log(e.target.value);
     this.state.euAlways = e.target.value;
 }
-
 
 class DrugIndex extends React.Component{
 
