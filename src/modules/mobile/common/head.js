@@ -1,6 +1,21 @@
 import React from 'react';
 import $ from 'jquery'
-import {Button, Col, Row, Space, Table, Tag, notification, Radio} from "antd";
+import {Button, Col, Row, Space, Table, Tag, notification, Radio, Descriptions} from "antd";
+
+
+
+function doctor(code) {
+    $.ajax({
+        url: global.constants.nhisApi+"nhis/mobile/doctor",
+        dataType: 'json',
+        data: {code:code},
+        cache: false,
+        success: function(data) {
+            this.setState({doctor: data.data});   // 注意这里
+        }.bind(this)
+    });
+}
+
 
 class Head extends React.Component {
     constructor(props) {
@@ -12,10 +27,14 @@ class Head extends React.Component {
             age: "",
             api: global.constants.nhisApi,
             hosId:'',
+            doctor:{name:'',},
         };
+        doctor = doctor.bind(this);
     }
 
     componentDidMount() {
+
+        doctor(this.props.doctorCode);
 
         console.log("head"+this.props.pkPv);
         console.log("api"+global.constants.nhisApi);
@@ -59,16 +78,14 @@ class Head extends React.Component {
 
     render() {
         return (
-            <div>
-                <Row>
-                    <Col span={6}><h1>{this.state.name}</h1></Col>
-                    <Col span={6}><h1>{this.state.bed}床</h1></Col>
-                    <Col span={6}> <h1>{this.state.gender}</h1></Col>
-                    <Col span={6}> <h1>{this.state.age}</h1></Col>
-                </Row>
-                <div style={{textAlign:"left"}}>
-                    <h2>住院号：{this.state.hosId}  身份：{this.state.hosType}  入院：{this.state.hosDate}   诊断： {this.state.diagName}</h2>
-                </div>
+            <div style={{marginBottom:20}}>
+                <Descriptions title={<div style={{textAlign:"left"}}><h2>{this.state.name}</h2></div>} bordered>
+                    <Descriptions.Item label="床位号">{this.state.bed}</Descriptions.Item>
+                    <Descriptions.Item label="性别">{this.state.gender}</Descriptions.Item>
+                    <Descriptions.Item label="年龄">{this.state.age}</Descriptions.Item>
+                    <Descriptions.Item label="医生">{this.state.doctor.name}</Descriptions.Item>
+                    <Descriptions.Item label="科室"></Descriptions.Item>
+                </Descriptions>
             </div>
         );
     }

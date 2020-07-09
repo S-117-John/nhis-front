@@ -215,7 +215,7 @@ class Home extends React.Component {
                         <a>详情</a>
                     </Space>
                 ),
-                width: 100,
+
                 fixed: 'right',
             },
         ];
@@ -224,7 +224,7 @@ class Home extends React.Component {
         return (
             <div style={{margin: 20}}>
 
-                <Head pkPv={this.state.pkPv}/>
+                <Head pkPv={this.state.pkPv} doctorCode={this.props.match.params.doctorCode}/>
 
                 <div>
                     <Row>
@@ -263,7 +263,7 @@ class Home extends React.Component {
                             rowSelection={rowSelection}
                             columns={columns}
                             dataSource={this.state.tableData}
-                            scroll={{x: 1500, y: 500}}
+                            scroll={{x: 1500, y: 400}}
                             pagination={false}
                             bordered
                             onChange={this.handleChange}

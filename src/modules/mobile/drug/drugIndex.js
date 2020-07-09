@@ -83,50 +83,6 @@ function radioGroup(e) {
     this.state.euAlways = e.target.value;
 }
 
-// 医嘱用法
-function listSupply() {
-    $.ajax({
-        url: global.constants.nhisApi+"nhis/mobile/bd/supply",
-        dataType: 'json',
-        cache: false,
-        success: function(data) {
-            this.setState({listBdSupply: data.data});
-        }.bind(this)
-    });
-}
-
-//保存
-function save(event) {
-    console.log(12313);
-    var cnOrdList = [];
-    this.state.ordDataList.map((item,index) => {
-        var cnOrd = new Object();
-        cnOrd.euAlways = this.state.euAlways;//长期or临时
-        cnOrd.pkOrd = item.pkPd;//医嘱主键
-        cnOrd.codeFreq = this.state.ordFreqCode;//医嘱频次编码
-        cnOrd.codeSupply = this.state.ordSupplyCode;//医嘱用法编码
-        cnOrd.pkPv = this.props.match.params.pkPv;
-        cnOrd.euPvtype = '3';//就诊类型
-        cnOrdList.push(cnOrd);
-    });
-    $.ajax({
-        url: global.constants.nhisApi+"nhis/mobile/ord/save",
-        dataType: 'json',
-        data:{ordList:JSON.stringify(cnOrdList)} ,
-        type: "POST",
-        cache: false,
-        success: function(data) {
-            this.setState({listBdSupply: data.data});
-        }.bind(this)
-    });
-}
-
-//长期/临时切换
-function radioGroup(e) {
-    console.log(e.target.value);
-    this.state.euAlways = e.target.value;
-}
-
 class DrugIndex extends React.Component{
 
     constructor(props) {
