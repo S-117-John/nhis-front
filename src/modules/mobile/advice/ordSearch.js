@@ -6,7 +6,7 @@ import {Button, Col, Input, Popconfirm, Row, Table} from "antd";
 
 function confirm(e) {
     console.log(e);
-    this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.state.pkPd);
+    this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.state.listPkPd);
 }
 
 function cancel(e) {
@@ -73,18 +73,13 @@ const ordData = [];
 
 class OrdSearch extends React.Component{
 
-
-
-
-
-
     constructor(props) {
         super(props);
         this.state = {
             data: this.data,
             ordData:ordData,
             searchValue: "",
-            pkPd:""
+            listPkPd:[]
         };
         confirm = confirm.bind(this);
     }
@@ -118,7 +113,14 @@ class OrdSearch extends React.Component{
                 }.bind(this)
             });
         }
+    }
 
+    //点击行
+    rowClick(record){
+        var pkPds=[];
+        pkPds.push(record.key)
+        pkPds.push("123213")
+        this.setState({listPkPd:pkPds})
     }
 
     render(){
@@ -145,7 +147,7 @@ class OrdSearch extends React.Component{
                         <Table
                             onRow={record => {
                                 return {
-                                    onClick: event => {this.setState({pkPd:record.key})}, // 点击行
+                                    onClick: event => {this.rowClick(record)}, // 点击行
                                     onDoubleClick: event => {},
                                     onContextMenu: event => {},
                                     onMouseEnter: event => {}, // 鼠标移入行

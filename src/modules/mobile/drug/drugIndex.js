@@ -1,11 +1,15 @@
 import React from "react";
-import $ from 'jquery'
+import $ from 'jquery';
 import {Button, DatePicker, Select, Radio, Input, Switch, Row, Col} from "antd";
 import Head from "../common/head";
+import DrugItem from "./drugItem";
 
 const { Option } = Select;
 
-const ordData={pkPd:"",name:'',spec:'',price:''};
+const ordDataList=[];
+
+//医嘱信息
+
 
 function onChange(date, dateString) {
     console.log(date, dateString);
@@ -13,34 +17,106 @@ function onChange(date, dateString) {
 
 function getBdPd(pkPd) {
     $.ajax({
-        url: global.constants.nhisApi+"nhis/mobile/drug?pkPd="+pkPd,
+        url: global.constants.nhisApi+"nhis/mobile/drug/list?ids="+pkPd,
         dataType: 'json',
         cache: false,
         success: function(data) {
-            this.setState({ordData: data.data});   // 注意这里
+            console.log(data.data);
+            this.setState({ordDataList: data.data});
         }.bind(this)
     });
 }
 
+//频次
+function listBdTermFreq() {
+    $.ajax({
+        url: global.constants.nhisApi+"nhis/mobile/bd/term/freq",
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            this.setState({bdTermFreq: data.data});
+        }.bind(this)
+    });
+}
+
+// 医嘱用法
+function listSupply() {
+    $.ajax({
+        url: global.constants.nhisApi+"nhis/mobile/bd/supply",
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            this.setState({listBdSupply: data.data});
+        }.bind(this)
+    });
+}
+
+//保存
+function save(event) {
+    console.log(12313);
+    var cnOrdList = [];
+    this.state.ordDataList.map((item,index) => {
+        var cnOrd = new Object();
+        cnOrd.euAlways = this.state.euAlways;//长期or临时
+        cnOrd.pkOrd = item.pkPd;//医嘱主键
+        cnOrd.codeFreq = this.state.ordFreqCode;//医嘱频次编码
+        cnOrd.codeSupply = this.state.ordSupplyCode;//医嘱用法编码
+        cnOrd.pkPv = this.props.match.params.pkPv;
+        cnOrd.euPvtype = '3';//就诊类型
+        cnOrdList.push(cnOrd);
+    });
+    $.ajax({
+        url: global.constants.nhisApi+"nhis/mobile/ord/save",
+        dataType: 'json',
+        data:{ordList:JSON.stringify(cnOrdList)} ,
+        type: "POST",
+        cache: false,
+        success: function(data) {
+            this.setState({listBdSupply: data.data});
+        }.bind(this)
+    });
+}
+
+//长期/临时切换
+function radioGroup(e) {
+    console.log(e.target.value);
+    this.state.euAlways = e.target.value;
+}
 
 class DrugIndex extends React.Component{
 
     constructor(props) {
         super(props);
+
         this.state = {
-            ordData: ordData,
+            ordDataList: ordDataList,//药品数据
+            bdTermFreq: [],//频次列表
+            listBdSupply:[],//医用用法列表
+            ordFreqCode:null,//医嘱频次编码
+            ordSupplyCode:null,//医嘱用法编码
+            startTime:null,//开始时间
+            cnOrd:null,//医嘱数据
+            euAlways:'0',
         };
 
         getBdPd = getBdPd.bind(this);
+        listBdTermFreq = listBdTermFreq.bind(this);
+        listSupply = listSupply.bind(this);
+        save = save.bind(this);
+        radioGroup = radioGroup.bind(this);
     }
 
     componentDidMount() {
         console.log("pkPd:"+this.props.match.params.pkPd);
         getBdPd(this.props.match.params.pkPd);
+        listBdTermFreq();
+        listSupply();
     }
 
     componentWillUnmount() {
     }
+
+
 
     render(){
         return(
@@ -50,37 +126,28 @@ class DrugIndex extends React.Component{
 
                 <div style={{textAlign:"right"}}>
                     <Button style={{marginRight:10}} type="primary">新增</Button>
-                    <Button style={{marginRight:10}} type="primary">保存</Button>
+                    <Button style={{marginRight:10}} type="primary" onClick={(event)=>save(event)}>保存</Button>
                     <Button style={{marginRight:10}} type="primary">签署</Button>
                     <Button style={{marginRight:10}} type="primary">删除</Button>
                     <Button style={{marginRight:10}} type="primary">返回</Button>
                 </div>
 
                 <div style={{marginTop:30}}>
-                    <Radio.Group defaultValue="a" buttonStyle="solid">
-                        <Radio.Button value="a">长期</Radio.Button>
-                        <Radio.Button value="b">临时</Radio.Button>
+                    <Radio.Group defaultValue="0" buttonStyle="solid" onChange={(event)=>radioGroup(event)}>
+                        <Radio.Button value="0">长期</Radio.Button>
+                        <Radio.Button value="1">临时</Radio.Button>
                     </Radio.Group>
 
                     <span style={{marginLeft:20}}>开始时间：</span>
                     <DatePicker onChange={onChange} />
                     <span style={{marginLeft:20}}>频次：</span>
-                    <Select defaultValue="lucy" style={{ width: 120 }}>
-                        <Option value="jack">Jack</Option>
-                        <Option value="lucy">Lucy</Option>
-                        <Option value="disabled" disabled>
-                            Disabled
-                        </Option>
-                        <Option value="Yiminghe">yiminghe</Option>
+
+                    <Select defaultValue="" style={{ width: 120 }} onSelect={(value=>this.state.ordFreqCode=value)}>
+                        {this.state.bdTermFreq.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
                     </Select>
                     <span style={{marginLeft:20}}>用法：</span>
-                    <Select defaultValue="lucy" style={{ width: 120 }} >
-                        <Option value="jack">Jack</Option>
-                        <Option value="lucy">Lucy</Option>
-                        <Option value="disabled" disabled>
-                            Disabled
-                        </Option>
-                        <Option value="Yiminghe">yiminghe</Option>
+                    <Select style={{ width: 120 }} onSelect={(value=>this.state.ordSupplyCode=value)}>
+                        {this.state.listBdSupply.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
                     </Select>
 
                     <Input addonBefore="首:"  defaultValue="1" style={{width:100,marginLeft:20}}/>
@@ -89,39 +156,7 @@ class DrugIndex extends React.Component{
                 </div>
 
                 <div style={{marginTop:30}}>
-                    <Row>
-                        <Col>
-                            <div>
-                                <div>
-                                    <span style={{fontSize:20}}>{this.state.ordData.name}</span>
-
-                                    <Input addonBefore="用量:" addonAfter="ml"  defaultValue="1" style={{width:200,marginLeft:20}}/>
-
-                                    <Input addonBefore="备注:"   defaultValue="1" style={{width:200,marginLeft:20}}/>
-                                </div>
-                                <span>【规格】{this.state.ordData.spec}   【单价】{this.state.ordData.price}   【剂量】250.0000ml   【贵重级别】普通物品</span>
-                            </div>
-                        </Col>
-                        <Col>
-                            <div style={{marginLeft:20}}>
-                                <div>
-                                    <span>加急：</span> <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked />
-                                </div>
-                                <div>
-                                    <span>自备：</span> <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked />
-                                </div>
-                            </div>
-                        </Col>
-                        <Col>
-
-                            <div style={{marginLeft:20}}>
-                                <Button type="primary">抗菌药信息</Button>
-                                <Button danger type="primary">删除</Button>
-                            </div>
-                        </Col>
-                    </Row>
-
-
+                    {this.state.ordDataList.map((item,index) => <DrugItem ordData={item} key={index}/>)}
                 </div>
             </div>
         );
