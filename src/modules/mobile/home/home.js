@@ -109,6 +109,18 @@ class Home extends React.Component {
                 dataIndex: 'bdOrdTypeName',
                 width: 60,
                 fixed: 'left',
+                filters: [
+                    {text: '西药', value: '西药'},
+                    {text: '草药', value: '草药'},
+                    {text: '检查', value: '检查'},
+                    {text: '检验', value: '检验'},
+                    {text: '手术', value: '手术'},
+                    {text: '会诊', value: '会诊'},
+                    {text: '卫材', value: '卫材'},
+                    {text: '药品', value: '药品'},
+                ],
+                filteredValue: filteredInfo.bdOrdTypeName || null,
+                onFilter: (value, record) => record.bdOrdTypeName.includes(value),
 
             },
             {
@@ -146,6 +158,8 @@ class Home extends React.Component {
                 title: '开始时间',
                 dataIndex: 'dateStart',
                 width: 200,
+                sorter: (a, b) => new Date(a.dateStart).getTime() - new Date(b.dateStart).getTime(),
+                sortDirections: ['descend','ascend'],
             },
 
             {
@@ -205,6 +219,8 @@ class Home extends React.Component {
                 fixed: 'right',
             },
         ];
+
+
         return (
             <div style={{margin: 20}}>
 
@@ -251,7 +267,7 @@ class Home extends React.Component {
                             pagination={false}
                             bordered
                             onChange={this.handleChange}
-                            rowKey={(record, index) => index}/>
+                            />
                     </div>
                 </div>
             </div>
