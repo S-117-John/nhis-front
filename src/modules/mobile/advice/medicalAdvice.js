@@ -14,8 +14,8 @@ class MedicalAdvice extends React.Component{
 
     render(){
         return(
-            <div>
-                <Head pkPv={this.props.match.params.pkPv}/>
+            <div style={{margin: 20}}>
+                <Head pkPv={this.props.match.params.pkPv} doctorCode={this.props.match.params.doctorCode}/>
                 <Tabs defaultActiveKey="1"  tabPosition={"left"}>
                     <TabPane tab="医嘱" key="1">
                         <Ord pkPv={this.props.match.params.pkPv}/>

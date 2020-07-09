@@ -102,6 +102,7 @@ class Home extends React.Component {
                 dataIndex: 'group',
                 width: 50,
                 fixed: 'left',
+
             },
 
             {
@@ -129,6 +130,7 @@ class Home extends React.Component {
                 render: text => <a>{text}</a>,
                 width: 200,
                 fixed: 'left',
+
             },
             {
                 title: '长',
@@ -153,6 +155,7 @@ class Home extends React.Component {
                 filteredValue: filteredInfo.euAlways || null,
                 // onFilter: (value, record) => record.euAlways.includes(value),
                 onFilter: (value, record) => record.euAlways.indexOf(value) === 0,
+
             },
             {
                 title: '开始时间',
@@ -160,52 +163,62 @@ class Home extends React.Component {
                 width: 200,
                 sorter: (a, b) => new Date(a.dateStart).getTime() - new Date(b.dateStart).getTime(),
                 sortDirections: ['descend','ascend'],
+
             },
 
             {
                 title: '用量',
                 dataIndex: 'quan',
                 render: text => <a>{text}</a>,
+
             },
             {
                 title: '用法',
                 dataIndex: 'codeSupply',
                 render: text => <a>{text}</a>,
+
             },
             {
                 title: '频次',
                 dataIndex: 'codeFreq',
                 render: text => <a>{text}</a>,
+
             },
             {
                 title: '首',
                 dataIndex: 'firstNum',
                 render: text => <a>{text}</a>,
+
             },
             {
                 title: '停止时间',
                 dataIndex: 'dateStop',
                 render: text => <a>{text}</a>,
+
             },
             {
                 title: '末',
                 dataIndex: 'lastNum',
                 render: text => <a>{text}</a>,
+
             },
             {
                 title: '开立人',
                 dataIndex: 'nameEmpOrd',
                 render: text => <a>{text}</a>,
+
             },
             {
                 title: '签署',
                 dataIndex: 'nameEmpOrd',
                 render: text => <a>{text}</a>,
+
             },
             {
                 title: '停嘱',
                 dataIndex: 'nameEmpStop',
                 render: text => <a>{text}</a>,
+
             },
             {
                 title: '操作',
@@ -217,6 +230,7 @@ class Home extends React.Component {
                 ),
 
                 fixed: 'right',
+
             },
         ];
 
@@ -224,7 +238,7 @@ class Home extends React.Component {
         return (
             <div style={{margin: 20}}>
 
-                <Head pkPv={this.state.pkPv} doctorCode={this.props.match.params.doctorCode}/>
+                <Head pkPv={this.props.match.params.pkPv} doctorCode={this.props.match.params.doctorCode}/>
 
                 <div>
                     <Row>
@@ -250,7 +264,7 @@ class Home extends React.Component {
                         <Col span={12}>
                             <div>
                                 <Button type="primary" style={{marginLeft: 20}}><Link
-                                    to={"/medicalAdvice/" + this.props.match.params.pkPv}>新医嘱</Link></Button>
+                                    to={"/medicalAdvice/" + this.props.match.params.pkPv+"/"+this.props.match.params.doctorCode}>新医嘱</Link></Button>
                                 <Button type="primary" style={{marginLeft: 20}}>停嘱</Button>
                                 <Button type="primary" style={{marginLeft: 20}}>签署</Button>
                                 <Button type="primary" style={{marginLeft: 20}}>删除</Button>
@@ -267,6 +281,7 @@ class Home extends React.Component {
                             pagination={false}
                             bordered
                             onChange={this.handleChange}
+                            rowKey={(record, index) => index}
                             />
                     </div>
                 </div>

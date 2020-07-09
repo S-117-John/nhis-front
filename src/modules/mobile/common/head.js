@@ -11,7 +11,10 @@ function doctor(code) {
         data: {code:code},
         cache: false,
         success: function(data) {
-            this.setState({doctor: data.data});   // 注意这里
+            if(data.code==200){
+                this.setState({doctorName: data.data.name});   // 注意这里
+            }
+
         }.bind(this)
     });
 }
@@ -27,15 +30,25 @@ class Head extends React.Component {
             age: "",
             api: global.constants.nhisApi,
             hosId:'',
-            doctor:{name:'',},
+            doctorName:'',
         };
-        doctor = doctor.bind(this);
+
     }
 
     componentDidMount() {
 
-        doctor(this.props.doctorCode);
+        // doctor(this.props.doctorCode);
+        $.ajax({
+            url: global.constants.nhisApi+"nhis/mobile/doctor",
+            dataType: 'json',
+            data: {code:this.props.doctorCode},
+            success: function(data) {
+                if(data.code==200){
+                    this.setState({doctorName: data.data.name});   // 注意这里
+                }
 
+            }.bind(this)
+        });
         console.log("head"+this.props.pkPv);
         console.log("api"+global.constants.nhisApi);
         this.serverRequest = $.get(global.constants.nhisApi+"nhis/mobile/patient?pkPv="+this.props.pkPv, function (result) {
@@ -73,7 +86,7 @@ class Head extends React.Component {
     }
 
     componentWillUnmount() {
-        this.serverRequest.abort();
+        this.setState = (state,callback)=>{ return; };
     }
 
     render() {
@@ -83,7 +96,7 @@ class Head extends React.Component {
                     <Descriptions.Item label="床位号">{this.state.bed}</Descriptions.Item>
                     <Descriptions.Item label="性别">{this.state.gender}</Descriptions.Item>
                     <Descriptions.Item label="年龄">{this.state.age}</Descriptions.Item>
-                    <Descriptions.Item label="医生">{this.state.doctor.name}</Descriptions.Item>
+                    <Descriptions.Item label="医生">{this.state.doctorName}</Descriptions.Item>
                     <Descriptions.Item label="科室"></Descriptions.Item>
                 </Descriptions>
             </div>
