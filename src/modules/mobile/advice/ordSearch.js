@@ -2,11 +2,13 @@ import React from "react";
 import $ from 'jquery'
 import {withRouter} from 'react-router-dom';
 import {Button, Col, Input, Popconfirm, Row, Table} from "antd";
+import { RollbackOutlined} from '@ant-design/icons';
 
+const { Search } = Input;
 
 function confirm(e) {
     console.log(e);
-    this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.state.listPkPd);
+    this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.state.listPkPd);
 }
 
 function cancel(e) {
@@ -126,17 +128,14 @@ class OrdSearch extends React.Component{
     render(){
         return(
             <div>
-                <div style={{width:800}}>
+                <div >
                     <Row>
                         <Col span={12}>
-                            <Input  ref='search' id="search"  placeholder="Basic usage" />
-                        </Col>
-                        <Col span={4}>
-                            <Button type="primary"  onClick={()=>this.listOrd($("#search").val())}>搜索</Button>
+                            <Search  onSearch={value => this.listOrd(value)}  enterButton />
                         </Col>
                         <Col span={1}></Col>
-                        <Col span={4}>
-                            <Button type="primary">取消</Button>
+                        <Col>
+                            <Button type="primary"><RollbackOutlined />取消</Button>
                         </Col>
                     </Row>
 

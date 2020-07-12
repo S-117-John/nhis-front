@@ -1,6 +1,6 @@
 import React from "react";
 import $ from 'jquery';
-import {Button, DatePicker, Select, Radio, Input, Switch, Row, Col} from "antd";
+import {Button, DatePicker, Select, Radio, Input, Switch, Row, Col, Spin} from "antd";
 import Head from "../common/head";
 import DrugItem from "./drugItem";
 
@@ -53,6 +53,7 @@ function listSupply() {
 
 //保存
 function save(event) {
+    this.setState({loading: true });
     console.log(12313);
     var cnOrdList = [];
     this.state.ordDataList.map((item,index) => {
@@ -72,7 +73,11 @@ function save(event) {
         type: "POST",
         cache: false,
         success: function(data) {
-            this.setState({listBdSupply: data.data});
+            console.log("保存成功");
+            this.setState({loading: false });
+        }.bind(this),
+        error:function (data) {
+            this.setState({loading: false });
         }.bind(this)
     });
 }
@@ -87,24 +92,25 @@ class DrugIndex extends React.Component{
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            ordDataList: ordDataList,//药品数据
-            bdTermFreq: [],//频次列表
-            listBdSupply:[],//医用用法列表
-            ordFreqCode:null,//医嘱频次编码
-            ordSupplyCode:null,//医嘱用法编码
-            startTime:null,//开始时间
-            cnOrd:null,//医嘱数据
-            euAlways:'0',
-        };
-
         getBdPd = getBdPd.bind(this);
         listBdTermFreq = listBdTermFreq.bind(this);
         listSupply = listSupply.bind(this);
         save = save.bind(this);
         radioGroup = radioGroup.bind(this);
     }
+
+
+    state = {
+        ordDataList: ordDataList,//药品数据
+        bdTermFreq: [],//频次列表
+        listBdSupply:[],//医用用法列表
+        ordFreqCode:null,//医嘱频次编码
+        ordSupplyCode:null,//医嘱用法编码
+        startTime:null,//开始时间
+        cnOrd:null,//医嘱数据
+        euAlways:'0',
+        loading: false
+    };
 
     componentDidMount() {
         console.log("pkPd:"+this.props.match.params.pkPd);
@@ -121,43 +127,44 @@ class DrugIndex extends React.Component{
     render(){
         return(
             <div style={{margin:30}}>
+                <Spin spinning={this.state.loading}>
+                    <Head pkPv={this.props.match.params.pkPv} doctorCode={this.props.match.params.doctorCode}/>
 
-                <Head pkPv={this.props.match.params.pkPv}/>
+                    <div style={{textAlign:"right"}}>
+                        <Button style={{marginRight:10}} type="primary">新增</Button>
+                        <Button style={{marginRight:10}} type="primary" onClick={(event)=>save(event)}>保存</Button>
+                        <Button style={{marginRight:10}} type="primary">签署</Button>
+                        <Button style={{marginRight:10}} type="primary">删除</Button>
+                        <Button style={{marginRight:10}} type="primary">返回</Button>
+                    </div>
 
-                <div style={{textAlign:"right"}}>
-                    <Button style={{marginRight:10}} type="primary">新增</Button>
-                    <Button style={{marginRight:10}} type="primary" onClick={(event)=>save(event)}>保存</Button>
-                    <Button style={{marginRight:10}} type="primary">签署</Button>
-                    <Button style={{marginRight:10}} type="primary">删除</Button>
-                    <Button style={{marginRight:10}} type="primary">返回</Button>
-                </div>
+                    <div style={{marginTop:30}}>
+                        <Radio.Group defaultValue="0" buttonStyle="solid" onChange={(event)=>radioGroup(event)}>
+                            <Radio.Button value="0">长期</Radio.Button>
+                            <Radio.Button value="1">临时</Radio.Button>
+                        </Radio.Group>
 
-                <div style={{marginTop:30}}>
-                    <Radio.Group defaultValue="0" buttonStyle="solid" onChange={(event)=>radioGroup(event)}>
-                        <Radio.Button value="0">长期</Radio.Button>
-                        <Radio.Button value="1">临时</Radio.Button>
-                    </Radio.Group>
+                        <span style={{marginLeft:20}}>开始时间：</span>
+                        <DatePicker onChange={onChange} />
+                        <span style={{marginLeft:20}}>频次：</span>
 
-                    <span style={{marginLeft:20}}>开始时间：</span>
-                    <DatePicker onChange={onChange} />
-                    <span style={{marginLeft:20}}>频次：</span>
+                        <Select defaultValue="" style={{ width: 120 }} onSelect={(value=>this.state.ordFreqCode=value)}>
+                            {this.state.bdTermFreq.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
+                        </Select>
+                        <span style={{marginLeft:20}}>用法：</span>
+                        <Select style={{ width: 120 }} onSelect={(value=>this.state.ordSupplyCode=value)}>
+                            {this.state.listBdSupply.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
+                        </Select>
 
-                    <Select defaultValue="" style={{ width: 120 }} onSelect={(value=>this.state.ordFreqCode=value)}>
-                        {this.state.bdTermFreq.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
-                    </Select>
-                    <span style={{marginLeft:20}}>用法：</span>
-                    <Select style={{ width: 120 }} onSelect={(value=>this.state.ordSupplyCode=value)}>
-                        {this.state.listBdSupply.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
-                    </Select>
+                        <Input addonBefore="首:"  defaultValue="1" style={{width:100,marginLeft:20}}/>
 
-                    <Input addonBefore="首:"  defaultValue="1" style={{width:100,marginLeft:20}}/>
+                        <Button style={{marginLeft:10}} type="primary">添加药品</Button>
+                    </div>
 
-                    <Button style={{marginLeft:10}} type="primary">添加药品</Button>
-                </div>
-
-                <div style={{marginTop:30}}>
-                    {this.state.ordDataList.map((item,index) => <DrugItem ordData={item} key={index}/>)}
-                </div>
+                    <div style={{marginTop:30}}>
+                        {this.state.ordDataList.map((item,index) => <DrugItem ordData={item} key={index}/>)}
+                    </div>
+                </Spin>
             </div>
         );
     }
