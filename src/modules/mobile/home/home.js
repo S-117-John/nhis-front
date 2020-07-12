@@ -3,7 +3,8 @@ import {Button, Col, Row, Space, Table, Tag, notification, Radio} from "antd";
 import $ from 'jquery'
 import Head from "../common/head";
 import {Link} from "react-router-dom";
-
+import ProTable, {ProColumns, TableDropdown} from '@ant-design/pro-table';
+import {PlusOutlined,StopOutlined,DeleteOutlined,EditOutlined} from '@ant-design/icons';
 
 const tableData = [
     {
@@ -18,7 +19,7 @@ class Home extends React.Component {
         super(props);
         this.state = {
             pkPv: this.props.match.params.pkPv,
-            tableData: tableData,
+            tableData: null,
             selectedRowKeys: [],
             filteredInfo: null,
         };
@@ -76,12 +77,12 @@ class Home extends React.Component {
                 break;
             case 'b':
                 this.setState({
-                    filteredInfo: {euAlways: ['0']},
+                    filteredInfo: {euAlways: ['1']},
                 });
                 break;
             case 'c':
                 this.setState({
-                    filteredInfo: {euAlways: ['1']},
+                    filteredInfo: {euAlways: ['0']},
                 });
                 break;
         }
@@ -96,7 +97,7 @@ class Home extends React.Component {
         };
         let {filteredInfo} = this.state;
         filteredInfo = filteredInfo || {};
-        const columns = [
+        const columns: ProColumns = [
             {
                 title: '组',
                 dataIndex: 'group',
@@ -137,9 +138,9 @@ class Home extends React.Component {
                 dataIndex: 'euAlways',
                 render: text => {
                     let color = text == "0" ? 'geekblue' : 'green';
-                    if (text === '1') {
+                    if (text === '0') {
                         text = '长期';
-                    } else if (text === '0') {
+                    } else if (text === '1') {
                         text = '临时';
                     }
                     return (
@@ -149,8 +150,8 @@ class Home extends React.Component {
                     );
                 },
                 filters: [
-                    {text: '长期', value: '1'},
-                    {text: '临时', value: '0'},
+                    {text: '长期', value: '0'},
+                    {text: '临时', value: '1'},
                 ],
                 filteredValue: filteredInfo.euAlways || null,
                 // onFilter: (value, record) => record.euAlways.includes(value),
@@ -162,7 +163,8 @@ class Home extends React.Component {
                 dataIndex: 'dateStart',
                 width: 200,
                 sorter: (a, b) => new Date(a.dateStart).getTime() - new Date(b.dateStart).getTime(),
-                sortDirections: ['descend','ascend'],
+                sortDirections: ['descend', 'ascend'],
+                valueType: 'dateTime',
 
             },
 
@@ -228,7 +230,6 @@ class Home extends React.Component {
                         <a>详情</a>
                     </Space>
                 ),
-
                 fixed: 'right',
 
             },
@@ -263,26 +264,60 @@ class Home extends React.Component {
 
                         <Col span={12}>
                             <div>
-                                <Button type="primary" style={{marginLeft: 20}}><Link
-                                    to={"/medicalAdvice/" + this.props.match.params.pkPv+"/"+this.props.match.params.doctorCode}>新医嘱</Link></Button>
-                                <Button type="primary" style={{marginLeft: 20}}>停嘱</Button>
-                                <Button type="primary" style={{marginLeft: 20}}>签署</Button>
-                                <Button type="primary" style={{marginLeft: 20}}>删除</Button>
+                                <Link
+                                    to={"/medicalAdvice/" + this.props.match.params.pkPv + "/" + this.props.match.params.doctorCode}><Button
+                                    type="primary" style={{marginLeft: 20}}><PlusOutlined/>
+                                    新医嘱</Button></Link>
+                                <Button type="primary" style={{marginLeft: 20}}><StopOutlined />停嘱</Button>
+                                <Button type="primary" style={{marginLeft: 20}}><EditOutlined />签署</Button>
+                                <Button type="primary" style={{marginLeft: 20}}><DeleteOutlined />删除</Button>
                             </div>
 
                         </Col>
                     </Row>
                     <div style={{marginTop: 20}}>
-                        <Table
-                            rowSelection={rowSelection}
+                        {/*<Table*/}
+                        {/*    rowSelection={rowSelection}*/}
+                        {/*    columns={columns}*/}
+                        {/*    dataSource={this.state.tableData}*/}
+                        {/*    scroll={{x: 1500, y: 400}}*/}
+                        {/*    pagination={false}*/}
+                        {/*    bordered*/}
+                        {/*    onChange={this.handleChange}*/}
+                        {/*    rowKey={record => record.key}*/}
+                        {/*    />*/}
+                        <ProTable
                             columns={columns}
-                            dataSource={this.state.tableData}
+                            search={false}
+                            options={false}
                             scroll={{x: 1500, y: 400}}
-                            pagination={false}
                             bordered
+                            pagination={false}
+                            dataSource={this.state.tableData}
+                            rowSelection={rowSelection}
                             onChange={this.handleChange}
-                            rowKey={(record, index) => index}
-                            />
+                            rowKey={record => record.key}
+                            tableAlertRender={({ selectedRowKeys, selectedRows }) =>{
+                                return(
+                                    <div style={{ textAlign:"left"}}>
+                                        当前共选中{selectedRowKeys.length} 项，共有 {selectedRows.reduce((pre, item) => {
+                                        if (item.nameEmpOrd.length === 0) {
+                                            return pre + 1;
+                                        }
+                                        return pre;
+                                    }, 0)} 项未签署
+                                    </div>
+                                );
+                            }}
+                            tableAlertOptionRender={(props) => {
+                                const { onCleanSelected } = props;
+                                return (
+                                    <div style={{ textAlign:"right"}}>
+                                        <a onClick={onCleanSelected}>清空</a>
+                                    </div>
+                                );
+                            }}
+                        />
                     </div>
                 </div>
             </div>

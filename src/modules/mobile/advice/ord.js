@@ -1,12 +1,13 @@
 import React from "react";
-import {Button, Col, Input, Row, Table, Radio} from "antd";
+import {Button, Col, Input, Row, Table, Radio, Tree, Divider, Space} from "antd";
 import $ from 'jquery'
 import {withRouter} from 'react-router-dom';
+import {SnippetsOutlined, CheckOutlined, RollbackOutlined} from '@ant-design/icons';
+
+
 const { Search } = Input;
 
-const treeData = [];
 
-const data = [];
 const columns = [
     {
         title: '医嘱名称',
@@ -47,52 +48,65 @@ const columns = [
 
 ];
 
-const ordColumns = [
-    {
-        title: '模板',
-        dataIndex: 'name',
-        key: 'name',
-        render: text => <a>{text}</a>,
-    },
-];
-const ordData = [];
-
 class Ord extends React.Component{
     constructor(props) {
         super(props);
-        this.state = {
-            data: data,
-            ordData:ordData
-        }
     }
 
+    state = {
+        data: [],
+        ordData:{},
+        treeData: [],
+    }
     componentDidMount() {
 
-        this.listEmpOrd();
+        this.serverRequest = this.listEmpOrd();
+
+        console.log("医嘱ord:"+this.props.doctorCode);
     }
 
     componentWillUnmount() {
-        // this.serverRequest.abort();
+
     }
+
+
+    onLoadData = treeNode => {
+        const { treeData } = this.state;
+        return new Promise(resolve => {
+            const { props } = treeNode;
+
+            setTimeout(() => {
+
+                this.setState({
+                    treeData: [...this.state.treeData],
+                });
+                resolve();
+            }, 1000);
+        });
+    };
+
+
 
     // 获取个人模板
     listEmpOrd(){
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/ord/set/emp?pkEmp=74f80fd350154f278c291828c7853ead",
+            url: global.constants.nhisApi+"nhis/mobile/doctor/personal/template?pkEmp=74f80fd350154f278c291828c7853ead",
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({ordData: data.data});   // 注意这里
+                this.setState({ordData: data.data,treeData:data.data});   // 注意这里
             }.bind(this)
         });
     }
 
-    onSelect (selectedKeys, info){
+    //选择树节点
+    onSelect = (selectedKeys, info) =>{
 
         console.log(selectedKeys);
     };
+
     toAdviceSearch(value){
-        this.props.history.push('/medicalAdviceSearch/'+this.props.pkPv+"/"+value)
+        this.props.history.push('/medicalAdviceSearch/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+value)
     }
     render(){
         // 跳转医嘱搜索页面
@@ -101,8 +115,9 @@ class Ord extends React.Component{
         return(
             <div>
                 <div style={{width:500}}>
-                    <Search placeholder="input search text"  onSearch={value => this.toAdviceSearch(value)}  enterButton />
+                    <Search  onSearch={value => this.toAdviceSearch(value)}  enterButton />
                 </div>
+
                 <div style={{marginTop:20}}>
                     <Row>
                         <Col span={5}>
@@ -113,40 +128,52 @@ class Ord extends React.Component{
                                 </Radio.Group>
                             </div>
                             <div>
-                                <Table
-                                    columns={ordColumns}
-                                    dataSource={this.state.ordData}
-                                    scroll={{y: 300 }}
-                                    pagination={false}
-                                    bordered
+                                <Tree
+                                    height={500}
+                                    loadData={this.onLoadData}
+                                    treeData={this.state.treeData}
+                                    showIcon={true}
+                                    icon={<SnippetsOutlined />}
+                                    onSelect={this.onSelect}
                                 />
                             </div>
                         </Col>
-                        <Col span={1}></Col>
+                        <Col span={1}>
+                            <Divider style={{height:500}} type="vertical"/>
+                        </Col>
                         <Col span={18}>
+
+                            <div style={{marginBottom:5}}>
+                                <Row>
+                                    <Col flex={1}>
+                                        <div style={{textAlign:"left"}}>
+                                            <Radio.Group defaultValue="a" buttonStyle="solid">
+                                                <Radio.Button value="a">长期</Radio.Button>
+                                                <Radio.Button value="b">临时</Radio.Button>
+                                            </Radio.Group>
+                                        </div>
+                                    </Col>
+                                    <Col flex={1}>
+                                        <div style={{textAlign:"right"}}>
+                                            <Space>
+                                                <Button type="primary"><CheckOutlined />确定</Button>
+                                                <Button type="primary"><RollbackOutlined />取消</Button>
+                                            </Space>
+                                        </div>
+                                    </Col>
+                                </Row>
+                            </div>
+
                             <div>
                                 <Table
                                     bordered
                                     columns={columns}
                                     dataSource={this.state.data}
                                     pagination={false}
-                                    scroll={{y: 300 }}
+                                    scroll={{y: 500 }}
                                 />
                             </div>
-                            <div style={{marginTop:20}}>
-                                <Row>
-                                    <Col span={12}>
-                                        <Radio.Group defaultValue="a" buttonStyle="solid">
-                                            <Radio.Button value="a">长期</Radio.Button>
-                                            <Radio.Button value="b">临时</Radio.Button>
-                                        </Radio.Group>
-                                    </Col>
-                                    <Col span={12}>
-                                        <Button type="primary">确定</Button>
-                                        <Button type="primary">取消</Button>
-                                    </Col>
-                                </Row>
-                            </div>
+
                         </Col>
                     </Row>
                 </div>

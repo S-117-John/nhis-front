@@ -122,7 +122,7 @@ class DrugIndex extends React.Component{
         return(
             <div style={{margin:30}}>
 
-                <Head pkPv={this.props.match.params.pkPv}/>
+                <Head pkPv={this.props.match.params.pkPv} doctorCode={this.props.match.params.doctorCode}/>
 
                 <div style={{textAlign:"right"}}>
                     <Button style={{marginRight:10}} type="primary">新增</Button>
