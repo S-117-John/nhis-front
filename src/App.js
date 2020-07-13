@@ -15,7 +15,7 @@ function App() {
       <Router>
         <Route path="/home/:pkPv/:doctorCode" component={ Home } />
         <Route path="/medicalAdvice/:pkPv/:doctorCode" component={ MedicalAdvice } />
-        <Route path="/medicalAdviceSearch/:pkPv/:doctorCode/:value" component={ MedicalAdviceSearch} />
+        <Route path="/medicalAdviceSearch/:pkPv/:doctorCode" component={ MedicalAdviceSearch} />
         <Route path="/drugIndex/:pkPv/:doctorCode/:pkPd" component={ DrugIndex} />
       </Router>
     </div>

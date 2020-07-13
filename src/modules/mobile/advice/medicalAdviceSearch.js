@@ -20,17 +20,7 @@ class MedicalAdviceSearch extends React.Component{
 
                 <Divider/>
 
-                <Tabs defaultActiveKey="1"  tabPosition={"left"}>
-                    <TabPane tab={<span><MedicineBoxOutlined />医嘱</span>} key="1">
-                        <OrdSearch value={this.props.match.params.value} doctorCode={this.props.match.params.doctorCode} pkPv={this.props.match.params.pkPv}/>
-                    </TabPane>
-                    <TabPane tab={<span><DeploymentUnitOutlined />检查</span>} key="2">
-                        Content of Tab Pane 2
-                    </TabPane>
-                    <TabPane  tab={<span><ExperimentOutlined />检验</span>} key="3">
-                        Content of Tab Pane 3
-                    </TabPane>
-                </Tabs>
+                <OrdSearch doctorCode={this.props.match.params.doctorCode} pkPv={this.props.match.params.pkPv}/>
             </div>
         );
     }

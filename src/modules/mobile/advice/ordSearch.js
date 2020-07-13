@@ -1,7 +1,7 @@
 import React from "react";
 import $ from 'jquery'
 import {withRouter} from 'react-router-dom';
-import {Button, Col, Input, Popconfirm, Row, Table} from "antd";
+import {Button, Col, Divider, Input, Popconfirm, Row, Table} from "antd";
 import { RollbackOutlined} from '@ant-design/icons';
 
 const { Search } = Input;
@@ -77,18 +77,16 @@ class OrdSearch extends React.Component{
 
     constructor(props) {
         super(props);
-        this.state = {
-            data: this.data,
-            ordData:ordData,
-            searchValue: "",
-            listPkPd:[]
-        };
         confirm = confirm.bind(this);
     }
 
+    state = {
+        data: this.data,
+        ordData:ordData,
+        searchValue: "",
+        listPkPd:[]
+    };
     componentDidMount() {
-
-        this.listOrd(this.props.value);
 
     }
 
@@ -141,25 +139,24 @@ class OrdSearch extends React.Component{
 
 
                 </div>
-                <div style={{marginTop:20}}>
-                    <div>
-                        <Table
-                            onRow={record => {
-                                return {
-                                    onClick: event => {this.rowClick(record)}, // 点击行
-                                    onDoubleClick: event => {},
-                                    onContextMenu: event => {},
-                                    onMouseEnter: event => {}, // 鼠标移入行
-                                    onMouseLeave: event => {},
-                                };
-                            }}
-                            bordered
-                            columns={columns}
-                            dataSource={this.state.ordData}
-                            pagination={false}
-                            scroll={{y: 300 }}
-                        />
-                    </div>
+                <Divider/>
+                <div>
+                    <Table
+                        onRow={record => {
+                            return {
+                                onClick: event => {this.rowClick(record)}, // 点击行
+                                onDoubleClick: event => {},
+                                onContextMenu: event => {},
+                                onMouseEnter: event => {}, // 鼠标移入行
+                                onMouseLeave: event => {},
+                            };
+                        }}
+                        bordered
+                        columns={columns}
+                        dataSource={this.state.ordData}
+                        pagination={false}
+                        scroll={{y: 500 }}
+                    />
                 </div>
             </div>
         );

@@ -24,7 +24,8 @@ class Home extends React.Component {
         tableData: null,
         selectedRowKeys: [],
         filteredInfo: null,
-        drawerVisible: false
+        drawerVisible: false,
+        ordDetail: {nameOrd:'',euAlways:'',dateStart:'',codeFreq:''},
     };
 
     componentDidMount() {
@@ -91,10 +92,23 @@ class Home extends React.Component {
 
     }
 
-    showDrawer = () => {
-        this.setState({
-            visible: true,
+    showDrawer = (record) => {
+        console.log(record)
+        $.ajax({
+            url: global.constants.nhisApi+"nhis/mobile/ord/detail",
+            dataType: 'json',
+            data:{pkCnOrd:record.pkCnord},
+            cache: false,
+            success: function(data) {
+                this.setState({
+                    visible: true,
+                    ordDetail: data.data
+                });
+            }.bind(this)
         });
+
+
+
     };
 
     onClose = () => {
@@ -239,12 +253,11 @@ class Home extends React.Component {
             {
                 title: '操作',
                 dataIndex: 'action',
-                render: (text) => (
-                    <Space size="middle">
-                        <a onClick={this.showDrawer}>详情</a>
-                    </Space>
+                render: (text, record) => (
+                    <a href="#!"  onClick={()=>this.showDrawer(record)}>详情</a>
                 ),
                 fixed: 'right',
+                width: 100
 
             },
         ];
@@ -256,6 +269,8 @@ class Home extends React.Component {
             <div style={{margin: 20}}>
 
                 <Head pkPv={this.props.match.params.pkPv} doctorCode={this.props.match.params.doctorCode}/>
+
+                <Divider/>
 
                 <div>
                     <Row>
@@ -281,7 +296,7 @@ class Home extends React.Component {
                         <Col span={12}>
                             <div>
                                 <Link
-                                    to={"/medicalAdvice/" + this.props.match.params.pkPv + "/" + this.props.match.params.doctorCode}><Button
+                                    to={"/medicalAdviceSearch/" + this.props.match.params.pkPv + "/" + this.props.match.params.doctorCode}><Button
                                     type="primary" style={{marginLeft: 20}}><PlusOutlined/>
                                     新医嘱</Button></Link>
                                 <Button type="primary" style={{marginLeft: 20}}><StopOutlined />停嘱</Button>
@@ -291,6 +306,7 @@ class Home extends React.Component {
 
                         </Col>
                     </Row>
+                    <Divider/>
                     <div style={{marginTop: 20}}>
                         <ProTable
                             columns={columns}
@@ -328,7 +344,7 @@ class Home extends React.Component {
                 </div>
 
                 <Drawer
-                    width={640}
+                    width={500}
                     placement="right"
                     closable={false}
                     onClose={this.onClose}
@@ -338,30 +354,27 @@ class Home extends React.Component {
 
                     <div>
                         <Descriptions column={1}>
-                            <Descriptions.Item label="医嘱期效">Zhou Maomao</Descriptions.Item>
-                            <Descriptions.Item label="开始时间">1810000000</Descriptions.Item>
-                            <Descriptions.Item label="医嘱内容">Hangzhou, Zhejiang</Descriptions.Item>
-                            <Descriptions.Item label="给药途径">empty</Descriptions.Item>
-                            <Descriptions.Item label="频率">1</Descriptions.Item>
-                            <Descriptions.Item label="单量">1</Descriptions.Item>
-                            <Descriptions.Item label="总量">1</Descriptions.Item>
-                            <Descriptions.Item label="用药天数">1</Descriptions.Item>
+                            <Descriptions.Item label="医嘱期效">{this.state.ordDetail.euAlways==='1'?'临时':'长期'}</Descriptions.Item>
+                            <Descriptions.Item label="开始时间">{this.state.ordDetail.dateStart}</Descriptions.Item>
+                            <Descriptions.Item label="医嘱内容">{this.state.ordDetail.nameOrd}</Descriptions.Item>
+                            <Descriptions.Item label="频次">{this.state.ordDetail.codeFreq}</Descriptions.Item>
+                            <Descriptions.Item label="用量">1</Descriptions.Item>
                             <Descriptions.Item label="医生嘱托">1</Descriptions.Item>
                         </Descriptions>
                         <Divider/>
                         <Descriptions column={1}>
-                            <Descriptions.Item label="执行时间">Zhou Maomao</Descriptions.Item>
-                            <Descriptions.Item label="执行科室">1810000000</Descriptions.Item>
-                            <Descriptions.Item label="执行状态">Hangzhou, Zhejiang</Descriptions.Item>
-                            <Descriptions.Item label="执行说明">empty</Descriptions.Item>
+                            <Descriptions.Item label="执行时间">1</Descriptions.Item>
+                            <Descriptions.Item label="执行科室">1</Descriptions.Item>
+                            <Descriptions.Item label="执行状态">1</Descriptions.Item>
+                            <Descriptions.Item label="执行说明">1</Descriptions.Item>
                             <Descriptions.Item label="执行情况">1</Descriptions.Item>
                         </Descriptions>
                         <Divider/>
                         <Descriptions column={1}>
-                            <Descriptions.Item label="停止时间">Zhou Maomao</Descriptions.Item>
-                            <Descriptions.Item label="开嘱医生">1810000000</Descriptions.Item>
-                            <Descriptions.Item label="校对护士">Hangzhou, Zhejiang</Descriptions.Item>
-                            <Descriptions.Item label="停嘱医生">empty</Descriptions.Item>
+                            <Descriptions.Item label="停止时间">1</Descriptions.Item>
+                            <Descriptions.Item label="开嘱医生">1</Descriptions.Item>
+                            <Descriptions.Item label="校对护士">1</Descriptions.Item>
+                            <Descriptions.Item label="停嘱医生">1</Descriptions.Item>
                             <Descriptions.Item label="确认停止">1</Descriptions.Item>
                         </Descriptions>
                     </div>

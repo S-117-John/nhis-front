@@ -8,44 +8,6 @@ import {SnippetsOutlined, CheckOutlined, RollbackOutlined} from '@ant-design/ico
 const { Search } = Input;
 
 
-const columns = [
-    {
-        title: '医嘱名称',
-        dataIndex: 'nameOrd',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '用量',
-        dataIndex: 'dosage',
-        key: 'dosage',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '单位',
-        dataIndex: 'unit',
-        key: 'unit',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '用法',
-        dataIndex: 'usage',
-        key: 'usage',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '频次',
-        dataIndex: 'frequency',
-        key: 'frequency',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '执行科室',
-        dataIndex: 'exeDept',
-        key: 'exeDept',
-        render: text => <a>{text}</a>,
-    },
-
-];
 function sleep (time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 }
@@ -53,7 +15,7 @@ function sleep (time) {
 
 
 
-class Ord extends React.Component{
+class Ris extends React.Component{
     constructor(props) {
         super(props);
     }
@@ -93,10 +55,10 @@ class Ord extends React.Component{
 
 
 
-    // 获取个人模板
+    // 获取检查模板
     listEmpOrd(){
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/doctor/personal/template?pkEmp=74f80fd350154f278c291828c7853ead",
+            url: global.constants.nhisApi+"nhis/mobile/ord/ris/temp",
             dataType: 'json',
             cache: false,
             success: function(data) {
@@ -134,9 +96,6 @@ class Ord extends React.Component{
     }
 
     render(){
-        // 跳转医嘱搜索页面
-
-
         return(
             <div>
                 <Spin tip="Loading..." spinning={this.state.loading}>
@@ -149,8 +108,8 @@ class Ord extends React.Component{
                             <Col span={5}>
                                 <div>
                                     <Radio.Group defaultValue="a" buttonStyle="solid">
-                                        <Radio.Button value="a">个人</Radio.Button>
-                                        <Radio.Button value="b">科室</Radio.Button>
+                                        <Radio.Button value="a">模板</Radio.Button>
+                                        <Radio.Button value="b">常用</Radio.Button>
                                     </Radio.Group>
                                 </div>
                                 <div>
@@ -164,44 +123,6 @@ class Ord extends React.Component{
                                     />
                                 </div>
                             </Col>
-                            <Col span={1}>
-                                <Divider style={{height:500}} type="vertical"/>
-                            </Col>
-                            <Col span={18}>
-
-                                <div style={{marginBottom:5}}>
-                                    <Row>
-                                        <Col flex={1}>
-                                            <div style={{textAlign:"left"}}>
-                                                <Radio.Group defaultValue="a" buttonStyle="solid">
-                                                    <Radio.Button value="a">长期</Radio.Button>
-                                                    <Radio.Button value="b">临时</Radio.Button>
-                                                </Radio.Group>
-                                            </div>
-                                        </Col>
-                                        <Col flex={1}>
-                                            <div style={{textAlign:"right"}}>
-                                                <Space>
-                                                    <Button type="primary" onClick={this.saveOrdTemp.bind(this)}><CheckOutlined />确定</Button>
-                                                    <Button type="primary"><RollbackOutlined />取消</Button>
-                                                </Space>
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </div>
-
-                                <div>
-                                    <Table
-                                        bordered
-                                        columns={columns}
-                                        dataSource={this.state.ordData}
-                                        pagination={false}
-                                        scroll={{y: 500 }}
-                                        rowKey={record => record.pkOrdsetdt}
-                                    />
-                                </div>
-
-                            </Col>
                         </Row>
                     </div>
                 </Spin>
@@ -211,4 +132,4 @@ class Ord extends React.Component{
     }
 }
 
-export default withRouter(Ord);
+export default withRouter(Ris);
