@@ -92,13 +92,15 @@ class Head extends React.Component {
     render() {
         return (
             <div style={{marginBottom:20}}>
-                <Descriptions title={<div style={{textAlign:"left"}}><h2>{this.state.name}</h2></div>} bordered>
+                <Descriptions title={<div style={{textAlign:"left"}}><h2>{this.state.name}</h2></div>}  column={6} size='small'>
                     <Descriptions.Item label="床位号">{this.state.bed}</Descriptions.Item>
                     <Descriptions.Item label="性别">{this.state.gender}</Descriptions.Item>
                     <Descriptions.Item label="年龄">{this.state.age}</Descriptions.Item>
                     <Descriptions.Item label="医生">{this.state.doctorName}</Descriptions.Item>
-                    <Descriptions.Item label="科室"></Descriptions.Item>
+                    <Descriptions.Item label="科室">外科</Descriptions.Item>
+                    <Descriptions.Item label="诊断">骨折</Descriptions.Item>
                 </Descriptions>
+
             </div>
         );
     }

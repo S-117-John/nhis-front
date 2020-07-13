@@ -5,7 +5,7 @@ import Head from "../common/head";
 import {Link} from "react-router-dom";
 import ProTable, {ProColumns, TableDropdown} from '@ant-design/pro-table';
 import {PlusOutlined,StopOutlined,DeleteOutlined,EditOutlined} from '@ant-design/icons';
-
+import "./home.css"
 const tableData = [
     {
         bdOrdType: {name: ''}
@@ -292,16 +292,6 @@ class Home extends React.Component {
                         </Col>
                     </Row>
                     <div style={{marginTop: 20}}>
-                        {/*<Table*/}
-                        {/*    rowSelection={rowSelection}*/}
-                        {/*    columns={columns}*/}
-                        {/*    dataSource={this.state.tableData}*/}
-                        {/*    scroll={{x: 1500, y: 400}}*/}
-                        {/*    pagination={false}*/}
-                        {/*    bordered*/}
-                        {/*    onChange={this.handleChange}*/}
-                        {/*    rowKey={record => record.key}*/}
-                        {/*    />*/}
                         <ProTable
                             columns={columns}
                             search={false}
