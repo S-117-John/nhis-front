@@ -6,11 +6,13 @@ import {Link} from "react-router-dom";
 import ProTable, {ProColumns, TableDropdown} from '@ant-design/pro-table';
 import {PlusOutlined,StopOutlined,DeleteOutlined,EditOutlined} from '@ant-design/icons';
 import "./home.css"
+
 const tableData = [
     {
         bdOrdType: {name: ''}
     }
 ];
+
 
 
 class Home extends React.Component {
@@ -296,9 +298,11 @@ class Home extends React.Component {
                         <Col span={12}>
                             <div>
                                 <Link
-                                    to={"/medicalAdviceSearch/" + this.props.match.params.pkPv + "/" + this.props.match.params.doctorCode}><Button
+                                    to={"/medicalAdviceSearch/" + this.props.match.params.pkPv + "/" + this.props.match.params.doctorCode}>
+                                    <Button
                                     type="primary" style={{marginLeft: 20}}><PlusOutlined/>
-                                    新医嘱</Button></Link>
+                                    新医嘱</Button>
+                                </Link>
                                 <Button type="primary" style={{marginLeft: 20}}><StopOutlined />停嘱</Button>
                                 <Button type="primary" style={{marginLeft: 20}}><EditOutlined />签署</Button>
                                 <Button type="primary" style={{marginLeft: 20}}><DeleteOutlined />删除</Button>

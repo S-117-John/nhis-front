@@ -1,6 +1,6 @@
 import React from "react";
 import $ from 'jquery';
-import {Button, DatePicker, Select, Radio, Input, Switch, Row, Col, Spin} from "antd";
+import {Button, DatePicker, Select, Radio, Input, Switch, Row, Col, Spin, Space, Divider} from "antd";
 import Head from "../common/head";
 import DrugItem from "./drugItem";
 
@@ -130,38 +130,48 @@ class DrugIndex extends React.Component{
             <div style={{margin:30}}>
                 <Spin spinning={this.state.loading}>
                     <Head pkPv={this.props.match.params.pkPv} doctorCode={this.props.match.params.doctorCode}/>
-
+                    <Divider/>
                     <div style={{textAlign:"right"}}>
-                        <Button style={{marginRight:10}} type="primary">新增</Button>
-                        <Button style={{marginRight:10}} type="primary" onClick={(event)=>save(event)}>保存</Button>
-                        <Button style={{marginRight:10}} type="primary">签署</Button>
-                        <Button style={{marginRight:10}} type="primary">删除</Button>
-                        <Button style={{marginRight:10}} type="primary">返回</Button>
+                        <Space>
+                            <Button type="primary">新增子医嘱</Button>
+                            <Button type="primary" onClick={(event)=>save(event)}>保存</Button>
+                            <Button type="primary">签署</Button>
+                            <Button type="primary">删除</Button>
+                            <Button type="primary">返回</Button>
+                        </Space>
                     </div>
+                    <Divider/>
+                    <div>
+                        <Row gutter={16}>
+                            <Col>
+                                <Radio.Group defaultValue="0" buttonStyle="solid" onChange={(event)=>radioGroup(event)}>
+                                    <Radio.Button value="0">长期</Radio.Button>
+                                    <Radio.Button value="1">临时</Radio.Button>
+                                </Radio.Group>
 
-                    <div style={{marginTop:30}}>
-                        <Radio.Group defaultValue="0" buttonStyle="solid" onChange={(event)=>radioGroup(event)}>
-                            <Radio.Button value="0">长期</Radio.Button>
-                            <Radio.Button value="1">临时</Radio.Button>
-                        </Radio.Group>
-
-                        <span style={{marginLeft:20}}>开始时间：</span>
-                        <DatePicker onChange={onChange} />
-                        <span style={{marginLeft:20}}>频次：</span>
-
-                        <Select defaultValue="" style={{ width: 120 }} onSelect={(value=>this.state.ordFreqCode=value)}>
-                            {this.state.bdTermFreq.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
-                        </Select>
-                        <span style={{marginLeft:20}}>用法：</span>
-                        <Select style={{ width: 120 }} onSelect={(value=>this.state.ordSupplyCode=value)}>
-                            {this.state.listBdSupply.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
-                        </Select>
-
-                        <Input addonBefore="首:"  defaultValue="1" style={{width:100,marginLeft:20}}/>
-
-                        <Button style={{marginLeft:10}} type="primary">添加药品</Button>
+                            </Col>
+                            <Col>
+                                <span>开始时间：</span>
+                                <DatePicker onChange={onChange} />
+                            </Col>
+                            <Col>
+                                <span>频次：</span>
+                                <Select defaultValue="" style={{ width: 120 }} onSelect={(value=>this.state.ordFreqCode=value)}>
+                                    {this.state.bdTermFreq.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
+                                </Select>
+                            </Col>
+                            <Col>
+                                <span>用法：</span>
+                                <Select style={{ width: 120 }} onSelect={(value=>this.state.ordSupplyCode=value)}>
+                                    {this.state.listBdSupply.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
+                                </Select>
+                            </Col>
+                            <Col>
+                                <Input addonBefore="首:"  defaultValue="1" style={{width:100}}/>
+                            </Col>
+                        </Row>
                     </div>
-
+                    <Divider/>
                     <div style={{marginTop:30}}>
                         {this.state.ordDataList.map((item,index) => <DrugItem ordData={item} key={index}/>)}
                     </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import $ from 'jquery';
-import {Button, Col, Input, Row, Switch} from "antd";
+import {Button, Col, Divider, Input, Row, Switch} from "antd";
 
 
 
@@ -27,7 +27,9 @@ class DrugItem extends React.Component{
 
                                 <Input addonBefore="备注:"   style={{width:200,marginLeft:20}}/>
                             </div>
-                            <span>【规格】{this.state.ordData.spec}   【单价】{this.state.ordData.price}   【剂量】250.0000ml   【贵重级别】普通物品</span>
+                            <div style={{textAlign:'left'}}>
+                                <span>【规格】{this.state.ordData.spec}   【单价】{this.state.ordData.price}   【剂量】250.0000ml   【贵重级别】普通物品</span>
+                            </div>
                         </div>
                     </Col>
                     <Col>
@@ -48,6 +50,7 @@ class DrugItem extends React.Component{
                         </div>
                     </Col>
                 </Row>
+                <Divider dashed={true}/>
             </div>
         );
     }

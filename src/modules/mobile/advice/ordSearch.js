@@ -1,8 +1,9 @@
 import React from "react";
 import $ from 'jquery'
 import {withRouter} from 'react-router-dom';
-import {Button, Col, Divider, Input, Popconfirm, Row, Table} from "antd";
+import {Button, Col, Divider, Input, Modal, Popconfirm, Row, Table} from "antd";
 import { RollbackOutlined} from '@ant-design/icons';
+import Ris from "./Ris";
 
 const { Search } = Input;
 
@@ -16,59 +17,7 @@ function cancel(e) {
 
 }
 
-const columns = [
-    {
-        title: '医嘱名称',
-        dataIndex: 'name',
-        key: 'name',
-        render: text => <Popconfirm
-            title={text}
-            onConfirm={confirm}
-            onCancel={cancel}
-            okText="选中药品"
-            cancelText="选中非药品"
-        >
-            <a href="#">{text}</a>
-        </Popconfirm>,
-    },
-    {
-        title: '规格',
-        dataIndex: 'spec',
-        key: 'spec',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '包装单位',
-        dataIndex: 'unit',
-        key: 'unit',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '描述',
-        dataIndex: 'desc',
-        key: 'desc',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '参考价格',
-        dataIndex: 'price',
-        key: 'price',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '库存量',
-        dataIndex: 'amount',
-        key: 'amount',
-        render: text => <a>{text}</a>,
-    },
-    {
-        title: '医保类型',
-        dataIndex: 'medicareType',
-        key: 'medicareType',
-        render: text => <a>{text}</a>,
-    },
-
-];
+//选择医嘱项
 
 const ordData = [];
 
@@ -84,7 +33,9 @@ class OrdSearch extends React.Component{
         data: this.data,
         ordData:ordData,
         searchValue: "",
-        listPkPd:[]
+        listPkPd:[],
+        visible: false,
+        modalTitle:'',
     };
     componentDidMount() {
 
@@ -97,12 +48,92 @@ class OrdSearch extends React.Component{
     onSelect (selectedKeys, info){
         console.log(selectedKeys);
     };
+    choose(record) {
+        console.log(record)
+        if(record.flagDurg!=null&&record.flagDurg=='1'){
+            //跳转至药品明细界面
+            this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+record.key);
+        }else{
+            this.showModal('新开检查项目');
+        }
+    }
+
+    columns = [
+        {
+            title: '医嘱名称',
+            dataIndex: 'nameOrd',
+            render: (text, record) => <a href="#!" onClick={()=>this.choose(record)}>{text}</a>,
+        },
+        {
+            title: '规格',
+            dataIndex: 'spec',
+
+            render: text => <a>{text}</a>,
+        },
+        {
+            title: '包装单位',
+            dataIndex: 'unit',
+
+            render: text => <a>{text}</a>,
+        },
+        {
+            title: '描述',
+            dataIndex: 'desc',
+
+            render: text => <a>{text}</a>,
+        },
+        {
+            title: '参考价格',
+            dataIndex: 'price',
+
+            render: text => <a>{text}</a>,
+        },
+        {
+            title: '库存量',
+            dataIndex: 'amount',
+
+            render: text => <a>{text}</a>,
+        },
+        {
+            title: '医保类型',
+            dataIndex: 'medicareType',
+
+            render: text => <a>{text}</a>,
+        },
+
+    ];
+
+
+    showModal = (title) => {
+        // this.setState({
+        //     visible: true,
+        //     modalTitle: title,
+        // });
+        const modal = Modal.success({
+            title: 'This is a notification message',
+            content: <Ris />,
+        });
+    };
+
+    handleOk = e => {
+        console.log(e);
+        this.setState({
+            visible: false,
+        });
+    };
+
+    handleCancel = e => {
+        console.log(e);
+        this.setState({
+            visible: false,
+        });
+    };
 
     listOrd(value){
         console.log(value);
         if(value!=""){
             $.ajax({
-                url: global.constants.nhisApi+"/nhis/mobile/ord/pd/list?spCode="+value,
+                url: global.constants.nhisApi+"/nhis/mobile/ord/search?spCode="+value,
                 dataType: 'json',
                 cache: false,
                 success: function(data) {
@@ -121,6 +152,11 @@ class OrdSearch extends React.Component{
         pkPds.push(record.key)
         pkPds.push("123213")
         this.setState({listPkPd:pkPds})
+    }
+
+    destroyModal(){
+        console.log('aaaaaaaaaaaaaa')
+        this.setState({visible:false})
     }
 
     render(){
@@ -152,12 +188,24 @@ class OrdSearch extends React.Component{
                             };
                         }}
                         bordered
-                        columns={columns}
+                        columns={this.columns}
                         dataSource={this.state.ordData}
                         pagination={false}
                         scroll={{y: 500 }}
                     />
                 </div>
+
+                <Modal
+                    title={this.state.modalTitle}
+                    visible={this.state.visible}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                    footer={null}
+                >
+                   <Ris destroyModal={this.destroyModal.bind(this)}/>
+                </Modal>
+
+
             </div>
         );
     }

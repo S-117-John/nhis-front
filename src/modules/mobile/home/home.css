@@ -1,1 +1,8 @@
-.clickRowStyle{background-color: #0ab1cb;}
+.ant-pro-table-alert-info {
+    display: flex;
+    align-items: center;
+}
+
+.ant-pro-table-alert-info-content {
+    flex: 1 1;
+}
