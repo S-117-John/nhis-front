@@ -116,23 +116,22 @@ class Ris extends React.Component {
 
     destroyAll() {
         console.log(23123213213);
-        // this.props.destroyModal();
+        this.props.destroyModal();
     }
 
     render() {
         return (
             <div>
                 <Spin tip="Loading..." spinning={this.state.loading}>
-                    <div>
-                        <Space>
-                            <Button type="primary">新增</Button>
-                            <Button type="primary">保存</Button>
-                            <Button type="primary">签署</Button>
-                            <Button type="primary">删除</Button>
-                            <Button type="primary" onClick={()=>this.destroyAll()}>返回</Button>
-                        </Space>
-                    </div>
-                    <Divider/>
+                    {/*<div>*/}
+                    {/*    <Space>*/}
+                    {/*        <Button type="primary">保存</Button>*/}
+                    {/*        <Button type="primary">签署</Button>*/}
+                    {/*        <Button type="primary">删除</Button>*/}
+                    {/*        <Button type="primary" onClick={()=>this.destroyAll()}>返回</Button>*/}
+                    {/*    </Space>*/}
+                    {/*</div>*/}
+                    {/*<Divider/>*/}
                     <div>
                         <Form
                             {...layout}

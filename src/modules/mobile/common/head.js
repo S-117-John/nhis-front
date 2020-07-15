@@ -51,7 +51,7 @@ class Head extends React.Component {
         });
         console.log("head"+this.props.pkPv);
         console.log("api"+global.constants.nhisApi);
-        this.serverRequest = $.get(global.constants.nhisApi+"nhis/mobile/patient?pkPv="+this.props.pkPv, function (result) {
+        this.serverRequest = $.get(global.constants.nhisApi+"nhis/mobile/patient?code="+this.props.pkPv, function (result) {
             console.log(result);
             if(result.code==400){
                 notification.open({
@@ -98,7 +98,7 @@ class Head extends React.Component {
                     <Descriptions.Item label="年龄">{this.state.age}</Descriptions.Item>
                     <Descriptions.Item label="医生">{this.state.doctorName}</Descriptions.Item>
                     <Descriptions.Item label="科室">外科</Descriptions.Item>
-                    <Descriptions.Item label="诊断">骨折</Descriptions.Item>
+                    <Descriptions.Item label="诊断">{this.state.diagName}</Descriptions.Item>
                 </Descriptions>
 
             </div>

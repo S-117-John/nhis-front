@@ -324,6 +324,7 @@ class Home extends React.Component {
                             onChange={this.handleChange}
                             rowKey={record => record.key}
                             tableAlertRender={({ selectedRowKeys, selectedRows }) =>{
+
                                 return(
                                     <div style={{ textAlign:"left"}}>
                                         当前共选中{selectedRowKeys.length} 项，共有 {selectedRows.reduce((pre, item) => {

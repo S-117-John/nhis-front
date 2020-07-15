@@ -14,13 +14,10 @@ function confirm(e) {
 
 function cancel(e) {
     console.log(e);
-
 }
 
 //选择医嘱项
-
 const ordData = [];
-
 
 class OrdSearch extends React.Component{
 
@@ -33,10 +30,11 @@ class OrdSearch extends React.Component{
         data: this.data,
         ordData:ordData,
         searchValue: "",
-        listPkPd:[],
+        listPkPd:[],//药品id数组
         visible: false,
         modalTitle:'',
     };
+
     componentDidMount() {
 
     }
@@ -48,15 +46,20 @@ class OrdSearch extends React.Component{
     onSelect (selectedKeys, info){
         console.log(selectedKeys);
     };
+
+    //选择医嘱项
     choose(record) {
         console.log(record)
         if(record.flagDurg!=null&&record.flagDurg=='1'){
             //跳转至药品明细界面
-            this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+record.key);
-        }else{
+            this.state.listPkPd.push(record.key);
+            this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.state.listPkPd);
+        }
+        else if(record.codeOrdType!=null&&record.codeOrdType=='02'){
             this.showModal('新开检查项目');
         }
     }
+
 
     columns = [
         {
@@ -105,14 +108,14 @@ class OrdSearch extends React.Component{
 
 
     showModal = (title) => {
-        // this.setState({
-        //     visible: true,
-        //     modalTitle: title,
-        // });
-        const modal = Modal.success({
-            title: 'This is a notification message',
-            content: <Ris />,
+        this.setState({
+            visible: true,
+            modalTitle: title,
         });
+        // const modal = Modal.info({
+        //     title: title,
+        //     content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
+        // });
     };
 
     handleOk = e => {
@@ -154,9 +157,14 @@ class OrdSearch extends React.Component{
         this.setState({listPkPd:pkPds})
     }
 
+    //销毁弹出框
     destroyModal(){
         console.log('aaaaaaaaaaaaaa')
-        this.setState({visible:false})
+        Modal.destroyAll();
+    }
+
+    goBack(){
+        window.history.back(-1)
     }
 
     render(){
@@ -169,7 +177,7 @@ class OrdSearch extends React.Component{
                         </Col>
                         <Col span={1}></Col>
                         <Col>
-                            <Button type="primary"><RollbackOutlined />取消</Button>
+                            <Button type="primary" onClick={this.goBack}><RollbackOutlined />取消</Button>
                         </Col>
                     </Row>
 
@@ -198,9 +206,19 @@ class OrdSearch extends React.Component{
                 <Modal
                     title={this.state.modalTitle}
                     visible={this.state.visible}
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}
-                    footer={null}
+                    // onOk={this.handleOk}
+                    // onCancel={this.handleCancel}
+                    footer={[
+                        <Button key="submit" type="primary" onClick={this.handleOk}>
+                            签署
+                        </Button>,
+                        <Button key="save" type="primary" onClick={this.handleOk}>
+                            保存
+                        </Button>,
+                        <Button key="back" onClick={this.handleCancel}>
+                            返回
+                        </Button>,
+                    ]}
                 >
                    <Ris destroyModal={this.destroyModal.bind(this)}/>
                 </Modal>

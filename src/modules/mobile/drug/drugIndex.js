@@ -1,8 +1,9 @@
 import React from "react";
 import $ from 'jquery';
-import {Button, DatePicker, Select, Radio, Input, Switch, Row, Col, Spin, Space, Divider} from "antd";
+import {Button, DatePicker, Select, Radio, Input, Switch, Row, Col, Spin, Space, Divider, Modal} from "antd";
 import Head from "../common/head";
 import DrugItem from "./drugItem";
+import DrugSearch from "./drugSearch";
 
 const { Option } = Select;
 
@@ -15,6 +16,7 @@ function onChange(date, dateString) {
     console.log(date, dateString);
 }
 
+//获取药品明细
 function getBdPd(pkPd) {
     $.ajax({
         url: global.constants.nhisApi+"nhis/mobile/drug/list?ids="+pkPd,
@@ -110,7 +112,8 @@ class DrugIndex extends React.Component{
         startTime:null,//开始时间
         cnOrd:null,//医嘱数据
         euAlways:'0',
-        loading: false
+        loading: false,
+        visible: false,
     };
 
     componentDidMount() {
@@ -124,6 +127,26 @@ class DrugIndex extends React.Component{
     }
 
 
+    showModal = () => {
+        this.setState({
+            visible: true,
+        });
+    };
+
+    handleOk = e => {
+        console.log(e);
+        this.setState({
+            visible: false,
+        });
+    };
+
+    handleCancel = e => {
+        console.log(e);
+        this.setState({
+            visible: false,
+        });
+    };
+
 
     render(){
         return(
@@ -133,7 +156,7 @@ class DrugIndex extends React.Component{
                     <Divider/>
                     <div style={{textAlign:"right"}}>
                         <Space>
-                            <Button type="primary">新增子医嘱</Button>
+                            <Button type="primary" onClick={this.showModal}>新增子医嘱</Button>
                             <Button type="primary" onClick={(event)=>save(event)}>保存</Button>
                             <Button type="primary">签署</Button>
                             <Button type="primary">删除</Button>
@@ -176,6 +199,18 @@ class DrugIndex extends React.Component{
                         {this.state.ordDataList.map((item,index) => <DrugItem ordData={item} key={index}/>)}
                     </div>
                 </Spin>
+
+
+                <Modal
+                    title="药品检索"
+                    visible={this.state.visible}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                    width={800}
+                >
+                    <DrugSearch/>
+                </Modal>
+
             </div>
         );
     }
