@@ -4,6 +4,8 @@ import {withRouter} from 'react-router-dom';
 import {Button, Col, Divider, Input, Modal, Popconfirm, Row, Table} from "antd";
 import { RollbackOutlined} from '@ant-design/icons';
 import Ris from "./Ris";
+import LisNew from "./LisNew";
+import DiagTreat from "./DiagTreat";
 
 const { Search } = Input;
 
@@ -18,6 +20,9 @@ function cancel(e) {
 
 //选择医嘱项
 const ordData = [];
+const risData=null;
+const lisData=null;
+const DiagTreatData=null;
 
 class OrdSearch extends React.Component{
 
@@ -32,7 +37,13 @@ class OrdSearch extends React.Component{
         searchValue: "",
         listPkPd:[],//药品id数组
         visible: false,
+        visibleLis:false,
+        visibleDiagTreat:false,
         modalTitle:'',
+        risData:null,
+        lisData:null,
+
+        DiagTreatData:null,
     };
 
     componentDidMount() {
@@ -56,7 +67,41 @@ class OrdSearch extends React.Component{
             this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.state.listPkPd);
         }
         else if(record.codeOrdType!=null&&record.codeOrdType=='02'){
-            this.showModal('新开检查项目');
+            $.get(global.constants.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
+                console.log(result);
+                if (result.code == 200) {
+                    this.setState({
+                        risData: result.data
+                    });
+                    this.showModal('新开检查项目');
+                }
+
+            }.bind(this));
+
+        }else if(record.codeOrdType!=null&&record.codeOrdType=='03'){
+            $.get(global.constants.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
+                console.log(result);
+                if (result.code == 200) {
+                    this.setState({
+                        lisData: result.data
+                    });
+                    this.showModalLis('新开检验项目');
+                }
+
+            }.bind(this));
+
+        }else{//诊疗
+            $.get(global.constants.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
+                console.log(result);
+                if (result.code == 200) {
+                    this.setState({
+                        DiagTreatData: result.data
+                    });
+                    this.showModalDiagTreat('新开诊疗项目');
+                }
+
+            }.bind(this));
+
         }
     }
 
@@ -117,18 +162,54 @@ class OrdSearch extends React.Component{
         //     content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
         // });
     };
-
-    handleOk = e => {
+    showModalLis = (title) => {
+        this.setState({
+            visibleLis: true,
+            modalTitle: title,
+        });
+        // const modal = Modal.info({
+        //     title: title,
+        //     content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
+        // });
+    };
+    showModalDiagTreat = (title) => {
+        this.setState({
+            visibleDiagTreat: true,
+            modalTitle: title,
+        });
+        // const modal = Modal.info({
+        //     title: title,
+        //     content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
+        // });
+    };
+    handleOk = (e,type) => {
         console.log(e);
         this.setState({
             visible: false,
         });
+        if('ris'==type){
+            console.log("检查："+JSON.stringify(this.refs['ris'].state.ordData))
+            console.log("检查部位："+JSON.stringify(this.refs['ris'].state.body))
+        }
+        // Modal.destroyAll();
     };
 
     handleCancel = e => {
         console.log(e);
         this.setState({
             visible: false,
+        });
+    };
+    handleCancelLis = e => {
+        console.log(e);
+        this.setState({
+            visibleLis: false,
+        });
+    };
+    handleCancelDiagTreat = e => {
+        console.log(e);
+        this.setState({
+            visibleDiagTreat: false,
         });
     };
 
@@ -162,7 +243,13 @@ class OrdSearch extends React.Component{
         console.log('aaaaaaaaaaaaaa')
         Modal.destroyAll();
     }
-
+    //销毁弹出框
+    destroyModalLis(){
+        Modal.destroyAll();
+    }
+    destroyModalDiagTreat(){
+        Modal.destroyAll();
+    }
     goBack(){
         window.history.back(-1)
     }
@@ -202,27 +289,69 @@ class OrdSearch extends React.Component{
                         scroll={{y: 500 }}
                     />
                 </div>
+                {/* 检查 */}
+                <div>
+                    <Modal
+                        title={this.state.modalTitle}
+                        visible={this.state.visible} onCancel={this.handleCancel}
+                        destroyOnClose={true}
+                        footer={[
 
-                <Modal
-                    title={this.state.modalTitle}
-                    visible={this.state.visible}
-                    // onOk={this.handleOk}
-                    // onCancel={this.handleCancel}
-                    footer={[
-                        <Button key="submit" type="primary" onClick={this.handleOk}>
-                            签署
-                        </Button>,
-                        <Button key="save" type="primary" onClick={this.handleOk}>
-                            保存
-                        </Button>,
-                        <Button key="back" onClick={this.handleCancel}>
-                            返回
-                        </Button>,
-                    ]}
-                >
-                   <Ris destroyModal={this.destroyModal.bind(this)}/>
-                </Modal>
-
+                            <Button key="save" type="primary" onClick={(event,type) => this.handleOk(event,'ris')}>
+                                保存
+                            </Button>,
+                            <Button key="back" onClick={this.handleCancel}>
+                                返回
+                            </Button>,
+                        ]}
+                    >
+                    <Ris ref={'ris'} destroyModal={this.destroyModal.bind(this)} ordData={this.state.risData}/>
+                    </Modal>
+                </div>
+                {/* 检验 */}
+                <div>
+                    <Modal
+                        title={this.state.modalTitle}
+                        visible={this.state.visibleLis} onCancel={this.handleCancelLis}
+                        // onOk={this.handleOk}
+                        // onCancel={this.handleCancel}
+                        footer={[
+                            // <Button key="submit" type="primary" onClick={this.handleOk}>
+                            //     签署
+                            // </Button>,
+                            <Button key="save" type="primary" onClick={this.handleOk}>
+                                保存
+                            </Button>,
+                            <Button key="back" onClick={this.handleCancelLis}>
+                                返回
+                            </Button>,
+                        ]}
+                    >
+                    <LisNew destroyModal={this.destroyModalLis.bind(this)} ordData={this.state.lisData}/>
+                    </Modal>
+                </div>
+                {/* 诊疗 */}
+                <div>
+                    <Modal
+                        title={this.state.modalTitle}
+                        visible={this.state.visibleDiagTreat} onCancel={this.handleCancelDiagTreat}
+                        // onOk={this.handleOk}
+                        // onCancel={this.handleCancel}
+                        footer={[
+                            // <Button key="submit" type="primary" onClick={this.handleOk}>
+                            //     签署
+                            // </Button>,
+                            <Button key="save" type="primary" onClick={this.handleOk}>
+                                保存
+                            </Button>,
+                            <Button key="back" onClick={this.handleCancelDiagTreat}>
+                                返回
+                            </Button>,
+                        ]}
+                    >
+                    <DiagTreat destroyModal={this.destroyModalDiagTreat.bind(this)} ordData={this.state.DiagTreatData}/>
+                    </Modal>
+                </div>
 
             </div>
         );

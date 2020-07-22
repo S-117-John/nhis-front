@@ -4,6 +4,7 @@ import {Button, DatePicker, Select, Radio, Input, Switch, Row, Col, Spin, Space,
 import Head from "../common/head";
 import DrugItem from "./drugItem";
 import DrugSearch from "./drugSearch";
+import ord from "../advice/ord";
 
 const { Option } = Select;
 
@@ -53,36 +54,6 @@ function listSupply() {
     });
 }
 
-//保存
-function save(event) {
-    this.setState({loading: true });
-    console.log(12313);
-    var cnOrdList = [];
-    this.state.ordDataList.map((item,index) => {
-        var cnOrd = new Object();
-        cnOrd.euAlways = this.state.euAlways;//长期or临时
-        cnOrd.pkOrd = item.pkPd;//医嘱主键
-        cnOrd.codeFreq = this.state.ordFreqCode;//医嘱频次编码
-        cnOrd.codeSupply = this.state.ordSupplyCode;//医嘱用法编码
-        cnOrd.pkPv = this.props.match.params.pkPv;
-        cnOrd.euPvtype = '3';//就诊类型
-        cnOrdList.push(cnOrd);
-    });
-    $.ajax({
-        url: global.constants.nhisApi+"nhis/mobile/ord/save",
-        dataType: 'json',
-        data:{ordList:JSON.stringify(cnOrdList)} ,
-        type: "POST",
-        cache: false,
-        success: function(data) {
-            console.log("保存成功");
-            this.setState({loading: false });
-        }.bind(this),
-        error:function (data) {
-            this.setState({loading: false });
-        }.bind(this)
-    });
-}
 
 
 //长期/临时切换
@@ -98,13 +69,12 @@ class DrugIndex extends React.Component{
         getBdPd = getBdPd.bind(this);
         listBdTermFreq = listBdTermFreq.bind(this);
         listSupply = listSupply.bind(this);
-        save = save.bind(this);
         radioGroup = radioGroup.bind(this);
     }
 
 
     state = {
-        ordDataList: ordDataList,//药品数据
+        ordDataList: [],//药品数据
         bdTermFreq: [],//频次列表
         listBdSupply:[],//医用用法列表
         ordFreqCode:null,//医嘱频次编码
@@ -114,6 +84,7 @@ class DrugIndex extends React.Component{
         euAlways:'0',
         loading: false,
         visible: false,
+        firstTime:''//首次
     };
 
     componentDidMount() {
@@ -133,10 +104,33 @@ class DrugIndex extends React.Component{
         });
     };
 
-    handleOk = e => {
-        console.log(e);
+    //弹出层选中药品
+    handleOk = (key) => {
+        console.log(key);
         this.setState({
             visible: false,
+        });
+        //根据药品主键查询药品信息
+        $.ajax({
+            url: global.constants.nhisApi+"nhis/mobile/drug?pkPd="+key,
+            dataType: 'json',
+            cache: false,
+            success: function(data) {
+                console.log(data.data);
+                let ordList = [];
+
+                this.state.ordDataList.map(function (item,index) {
+                    ordList.push(item);
+                })
+                ordList.push(data.data);
+                console.log("新数组"+JSON.stringify(ordList));
+                this.setState({
+                    ordDataList: ordList
+                });
+
+
+
+            }.bind(this)
         });
     };
 
@@ -148,6 +142,75 @@ class DrugIndex extends React.Component{
     };
 
 
+    //数据整合
+    resultDataFactory(){
+        this.state.ordDataList.map((item,index) => {
+            console.log( 'index:'+index)
+            console.log( 'item:'+JSON.stringify(item))
+            console.log("备注："+this.refs[index].state.note)
+            console.log("用量："+this.refs[index].state.dosage)
+            console.log("加急："+this.refs[index].state.emergency)
+            console.log("自备："+this.refs[index].state.own)
+            console.log("皮试："+this.refs[index].state.skin)
+            item.codeFreq = this.state.ordFreqCode;//频次
+            item.codeSupply = this.state.ordSupplyCode;//医嘱用法编码
+            item.firstNum = this.state.firstTime;//首日次数
+            item.quan = this.refs[index].state.dosage;//用量
+            item.flagSelf = this.refs[index].state.own?'1':'0';//自备药
+            item.euSt = this.refs[index].state.skin?'1':'0';//皮试
+            item.noteOrd = this.refs[index].state.note;//医嘱备注
+            item.dateStart = this.state.startTime;//开始时间
+            item.euAlways = this.state.euAlways;//长期or临时
+            item.euPvtype = '3';//就诊类型
+            item.descOrd = this.state.descOrd;
+            item.flagDurg = '1';
+            console.log('结果：'+JSON.stringify(item))
+        })
+    }
+
+
+    //签署
+    sign(e){
+        console.log(JSON.stringify(this.state.ordDataList))
+        this.resultDataFactory();
+    }
+
+    //首次
+    firstTime(event) {
+        console.log('首次'+event.target.value);    //获取修改后的值
+        this.setState({
+            firstTime : event.target.value
+        })
+    }
+
+
+//保存
+ save(event) {
+    this.setState({loading: true });
+    console.log(12313);
+    var cnOrdList = [];
+    this.resultDataFactory();
+    var jsonData = {
+        cnOrdList : this.state.ordDataList,
+        code : this.props.match.params.doctorCode,
+        codeIp : this.props.match.params.pkPv,
+    };
+    $.ajax({
+        url: global.constants.nhisApi+"nhis/mobile/ord/save",
+        dataType: 'json',
+        data:{ordList:JSON.stringify(jsonData)} ,
+        type: "POST",
+        cache: false,
+        success: function(data) {
+            console.log("保存成功");
+            this.setState({loading: false });
+        }.bind(this),
+        error:function (data) {
+            this.setState({loading: false });
+        }.bind(this)
+    });
+}
+
     render(){
         return(
             <div style={{margin:30}}>
@@ -157,8 +220,8 @@ class DrugIndex extends React.Component{
                     <div style={{textAlign:"right"}}>
                         <Space>
                             <Button type="primary" onClick={this.showModal}>新增子医嘱</Button>
-                            <Button type="primary" onClick={(event)=>save(event)}>保存</Button>
-                            <Button type="primary">签署</Button>
+                            <Button type="primary" onClick={(event)=>this.save(event)}>保存</Button>
+                            <Button type="primary" onClick={(event)=>this.sign(event)}>签署</Button>
                             <Button type="primary">删除</Button>
                             <Button type="primary">返回</Button>
                         </Space>
@@ -175,11 +238,11 @@ class DrugIndex extends React.Component{
                             </Col>
                             <Col>
                                 <span>开始时间：</span>
-                                <DatePicker onChange={onChange} />
+                                <DatePicker showTime={{ format: 'HH:mm' }}  onChange={onChange} />
                             </Col>
                             <Col>
                                 <span>频次：</span>
-                                <Select defaultValue="" style={{ width: 120 }} onSelect={(value=>this.state.ordFreqCode=value)}>
+                                <Select style={{ width: 120 }} onSelect={(value=>this.state.ordFreqCode=value)}>
                                     {this.state.bdTermFreq.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
                                 </Select>
                             </Col>
@@ -190,13 +253,13 @@ class DrugIndex extends React.Component{
                                 </Select>
                             </Col>
                             <Col>
-                                <Input addonBefore="首:"  defaultValue="1" style={{width:100}}/>
+                                <Input addonBefore="首:"  onChange={event => this.firstTime(event)} style={{width:100}}/>
                             </Col>
                         </Row>
                     </div>
                     <Divider/>
                     <div style={{marginTop:30}}>
-                        {this.state.ordDataList.map((item,index) => <DrugItem ordData={item} key={index}/>)}
+                        {this.state.ordDataList.map((item,index) => <DrugItem ref={index} ordData={item} key={index}/>)}
                     </div>
                 </Spin>
 
@@ -207,13 +270,16 @@ class DrugIndex extends React.Component{
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     width={800}
+                    footer={null}
                 >
-                    <DrugSearch/>
+                    <DrugSearch handleOk={this.handleOk}/>
                 </Modal>
 
             </div>
         );
     }
+
+
 }
 
 export default DrugIndex;

@@ -31,6 +31,7 @@ class Head extends React.Component {
             api: global.constants.nhisApi,
             hosId:'',
             doctorName:'',
+            deptName:'',
         };
 
     }
@@ -77,7 +78,8 @@ class Head extends React.Component {
                     // 入院日期
                     hosDate: result.data.dateReg,
                     // 诊断
-                    diagName: result.data.diagName
+                    diagName: result.data.diagName,
+                    deptName: result.data.deptName
                 });
             }
 
@@ -97,7 +99,7 @@ class Head extends React.Component {
                     <Descriptions.Item label="性别">{this.state.gender}</Descriptions.Item>
                     <Descriptions.Item label="年龄">{this.state.age}</Descriptions.Item>
                     <Descriptions.Item label="医生">{this.state.doctorName}</Descriptions.Item>
-                    <Descriptions.Item label="科室">外科</Descriptions.Item>
+                    <Descriptions.Item label="科室">{this.state.deptName}</Descriptions.Item>
                     <Descriptions.Item label="诊断">{this.state.diagName}</Descriptions.Item>
                 </Descriptions>
 
