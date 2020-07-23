@@ -13,22 +13,9 @@ const ordDataList=[];
 //医嘱信息
 
 
-function onChange(date, dateString) {
-    console.log(date, dateString);
-}
 
 //获取药品明细
-function getBdPd(pkPd) {
-    $.ajax({
-        url: global.constants.nhisApi+"nhis/mobile/drug/list?ids="+pkPd,
-        dataType: 'json',
-        cache: false,
-        success: function(data) {
-            console.log(data.data);
-            this.setState({ordDataList: data.data});
-        }.bind(this)
-    });
-}
+
 
 //频次
 function listBdTermFreq() {
@@ -66,10 +53,10 @@ class DrugIndex extends React.Component{
 
     constructor(props) {
         super(props);
-        getBdPd = getBdPd.bind(this);
         listBdTermFreq = listBdTermFreq.bind(this);
         listSupply = listSupply.bind(this);
         radioGroup = radioGroup.bind(this);
+
     }
 
 
@@ -89,12 +76,26 @@ class DrugIndex extends React.Component{
 
     componentDidMount() {
         console.log("pkPd:"+this.props.match.params.pkPd);
-        getBdPd(this.props.match.params.pkPd);
+
         listBdTermFreq();
         listSupply();
+        this.getBdPd(this.props.match.params.pkPd);
     }
 
     componentWillUnmount() {
+        this.setState = ()=>false;
+
+    }
+
+    //删除子组件
+    deleteChild(id){
+        var newArr = this.state.ordDataList.reduce((total, current) => {
+            current.pkCnOrd !== id && total.push(current);
+            return total;
+        }, []);
+        this.setState({
+            ordDataList:newArr
+        })
     }
 
 
@@ -103,6 +104,19 @@ class DrugIndex extends React.Component{
             visible: true,
         });
     };
+
+    //查询药品明细
+    getBdPd(pkPd) {
+        $.ajax({
+            url: global.constants.nhisApi+"nhis/mobile/drug/list?ids="+pkPd,
+            dataType: 'json',
+            cache: false,
+            success: function(data) {
+                console.log("药品明细："+data.data);
+                this.setState({ordDataList: data.data});
+            }.bind(this)
+        });
+    }
 
     //弹出层选中药品
     handleOk = (key) => {
@@ -142,6 +156,12 @@ class DrugIndex extends React.Component{
     };
 
 
+    onDateStartChange(date, dateString) {
+        this.setState({
+            startTime:dateString
+        })
+    }
+
     //数据整合
     resultDataFactory(){
         this.state.ordDataList.map((item,index) => {
@@ -163,7 +183,7 @@ class DrugIndex extends React.Component{
             item.euAlways = this.state.euAlways;//长期or临时
             item.euPvtype = '3';//就诊类型
             item.descOrd = this.state.descOrd;
-            item.flagDurg = '1';
+            item.pkOrd = item.pkPd;
             console.log('结果：'+JSON.stringify(item))
         })
     }
@@ -173,6 +193,25 @@ class DrugIndex extends React.Component{
     sign(e){
         console.log(JSON.stringify(this.state.ordDataList))
         this.resultDataFactory();
+        var jsonData = {
+            cnOrdList : this.state.ordDataList,
+            code : this.props.match.params.doctorCode,
+            codeIp : this.props.match.params.pkPv,
+            saveType : 1,
+        };
+        $.ajax({
+            url: global.constants.nhisApi+"nhis/mobile/ord/save",
+            data:{ordList:JSON.stringify(jsonData)} ,
+            type: "POST",
+            cache: false,
+            success: function(data) {
+                console.log("保存成功");
+                this.setState({loading: false });
+            }.bind(this),
+            error:function (data) {
+                this.setState({loading: false });
+            }.bind(this)
+        });
     }
 
     //首次
@@ -187,25 +226,29 @@ class DrugIndex extends React.Component{
 //保存
  save(event) {
     this.setState({loading: true });
-    console.log(12313);
+    console.log("保存开始");
     var cnOrdList = [];
     this.resultDataFactory();
     var jsonData = {
         cnOrdList : this.state.ordDataList,
         code : this.props.match.params.doctorCode,
         codeIp : this.props.match.params.pkPv,
+        saveType : 0,
     };
+    debugger;
     $.ajax({
         url: global.constants.nhisApi+"nhis/mobile/ord/save",
-        dataType: 'json',
         data:{ordList:JSON.stringify(jsonData)} ,
         type: "POST",
         cache: false,
         success: function(data) {
             console.log("保存成功");
             this.setState({loading: false });
+            //跳转至首页
+            this.props.history.push('/home/'+this.props.match.params.pkPv+"/"+this.props.match.params.doctorCode+"/"+this.props.match.params.currentDeptCode);
         }.bind(this),
         error:function (data) {
+            console.log("保存失败");
             this.setState({loading: false });
         }.bind(this)
     });
@@ -222,7 +265,6 @@ class DrugIndex extends React.Component{
                             <Button type="primary" onClick={this.showModal}>新增子医嘱</Button>
                             <Button type="primary" onClick={(event)=>this.save(event)}>保存</Button>
                             <Button type="primary" onClick={(event)=>this.sign(event)}>签署</Button>
-                            <Button type="primary">删除</Button>
                             <Button type="primary">返回</Button>
                         </Space>
                     </div>
@@ -238,7 +280,7 @@ class DrugIndex extends React.Component{
                             </Col>
                             <Col>
                                 <span>开始时间：</span>
-                                <DatePicker showTime={{ format: 'HH:mm' }}  onChange={onChange} />
+                                <DatePicker showTime={{ format: 'HH:mm' }}  onChange={(date,dateString)=>this.onDateStartChange(date,dateString)} />
                             </Col>
                             <Col>
                                 <span>频次：</span>
@@ -259,7 +301,7 @@ class DrugIndex extends React.Component{
                     </div>
                     <Divider/>
                     <div style={{marginTop:30}}>
-                        {this.state.ordDataList.map((item,index) => <DrugItem ref={index} ordData={item} key={index}/>)}
+                        {this.state.ordDataList.map((item,index) => <DrugItem ref={index} ordData={item} key={index} deleteChild={this.deleteChild.bind(this)}/>)}
                     </div>
                 </Spin>
 

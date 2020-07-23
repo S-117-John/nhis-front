@@ -20,7 +20,7 @@ class MedicalAdviceSearch extends React.Component{
 
                 <Divider/>
 
-                <OrdSearch doctorCode={this.props.match.params.doctorCode} pkPv={this.props.match.params.pkPv}/>
+                <OrdSearch doctorCode={this.props.match.params.doctorCode} pkPv={this.props.match.params.pkPv} currentDeptCode={this.props.match.params.currentDeptCode}/>
             </div>
         );
     }

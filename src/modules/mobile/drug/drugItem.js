@@ -57,6 +57,11 @@ class DrugItem extends React.Component{
         })
     }
 
+    //删除
+    delete(event){
+        this.props.deleteChild(this.state.ordData.pkCnOrd)
+    }
+
     render() {
         return(
             <div>
@@ -92,7 +97,7 @@ class DrugItem extends React.Component{
 
                         <div style={{marginLeft:20}}>
                             <Button type="primary">抗菌药信息</Button>
-                            <Button danger type="primary">删除</Button>
+                            <Button danger type="primary" onClick={event => this.delete(event)}>删除</Button>
                         </div>
                     </Col>
                 </Row>
@@ -104,7 +109,7 @@ class DrugItem extends React.Component{
                                 </span>
                         </Col>
                         <Col>
-                            <span visible={this.state.ordData.flagSt===1? 1:0}> <span>皮试：</span> <Switch checkedChildren="待查" unCheckedChildren="不查" onChange={(checked, event) => this.skin(checked,event)}/> </span>
+                            <span visible={this.state.ordData.flagSt===1? 'true':'false'}> <span>皮试：</span> <Switch checkedChildren="待查" unCheckedChildren="不查" onChange={(checked, event) => this.skin(checked,event)}/> </span>
                         </Col>
                     </Row>
                 </div>

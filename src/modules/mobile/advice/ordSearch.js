@@ -1,7 +1,7 @@
 import React from "react";
 import $ from 'jquery'
 import {withRouter} from 'react-router-dom';
-import {Button, Col, Divider, Input, Modal, Popconfirm, Row, Table} from "antd";
+import {Button, Col, Divider, Input, Modal, Spin,Popconfirm, Row, Table} from "antd";
 import { RollbackOutlined} from '@ant-design/icons';
 import Ris from "./Ris";
 import LisNew from "./LisNew";
@@ -42,7 +42,7 @@ class OrdSearch extends React.Component{
         modalTitle:'',
         risData:null,
         lisData:null,
-
+        loading: false,
         DiagTreatData:null,
     };
 
@@ -52,6 +52,7 @@ class OrdSearch extends React.Component{
 
     componentWillUnmount() {
         // this.serverRequest.abort();
+        this.setState = ()=>false;
     }
 
     onSelect (selectedKeys, info){
@@ -64,7 +65,7 @@ class OrdSearch extends React.Component{
         if(record.flagDurg!=null&&record.flagDurg=='1'){
             //跳转至药品明细界面
             this.state.listPkPd.push(record.key);
-            this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.state.listPkPd);
+            this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.props.currentDeptCode+"/"+this.state.listPkPd);
         }
         else if(record.codeOrdType!=null&&record.codeOrdType=='02'){
             $.get(global.constants.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
@@ -157,10 +158,10 @@ class OrdSearch extends React.Component{
             visible: true,
             modalTitle: title,
         });
-        // const modal = Modal.info({
-        //     title: title,
-        //     content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
-        // });
+        //  const modal = Modal.info({
+        //      title: title,
+        //      content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
+        //  });
     };
     showModalLis = (title) => {
         this.setState({
@@ -182,14 +183,51 @@ class OrdSearch extends React.Component{
         //     content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
         // });
     };
+    //检查确定保存方法
     handleOk = (e,type) => {
         console.log(e);
-        this.setState({
-            visible: false,
-        });
+        this.setState({loading: true });
         if('ris'==type){
             console.log("检查："+JSON.stringify(this.refs['ris'].state.ordData))
-            console.log("检查部位："+JSON.stringify(this.refs['ris'].state.body))
+            var dataOld=this.refs['ris'].state.ordData.dataList[0];
+            var dataNew=this.refs['ris'].state;
+            var exeDept=dataNew.exeDept;
+            if(!exeDept){
+                exeDept=this.refs['ris'].state.ordData.exDeptList[0].pkDept;
+            }
+            var saveData={pkOrd:dataOld.pkOrd,codeOrd:dataOld.code,
+                nameOrd:dataOld.name,purpose:dataNew.purpose,
+                dateStart:dataNew.startTime,codeApply:this.refs['ris'].state.ordData.codeApple[0],pkPv:null,pkPi:null,
+                pkDeptExec:exeDept,codeOrdType:dataOld.codeOrdtype,
+                flagBl:dataOld.flagCg,quan:1,flagEmer:"0",
+                priceCg:dataOld.pricestr,euOrdtype:dataOld.euOrdtype,
+                risNotice:dataNew.notice,note:dataNew.note,descBody:dataNew.body
+                }
+            var saveDataList=new Array();
+            saveDataList[0]=saveData;
+            var jsonData = {
+                risApplyList : saveDataList,
+                code : this.props.match.params.doctorCode,
+                codeIp : this.props.match.params.pkPv,
+                codeDept:this.props.currentDeptCode
+            };
+            $.ajax({
+                url: global.constants.nhisApi+"nhis/mobile/ord/saveRisApplyList",
+                //dataType: 'json',
+                data:{param:JSON.stringify(jsonData)} ,
+                type: "POST",
+                cache: false,
+                success: function(data) {
+                    console.log("保存成功");
+                    this.setState({
+                        visible: false,
+                    });
+                    this.setState({loading: false });
+                }.bind(this),
+                error:function (data) {
+                    this.setState({loading: false });
+                }.bind(this)
+            });
         }
         // Modal.destroyAll();
     };
@@ -199,6 +237,54 @@ class OrdSearch extends React.Component{
         this.setState({
             visible: false,
         });
+    };
+    //检验确定保存方法
+    handleOkLis = (e,type) => {
+        console.log(e);
+        this.setState({loading: true });
+        if('lis'==type){
+            var dataOld=this.refs['lis'].state.ordData.dataList[0];
+            var dataNew=this.refs['lis'].state;
+            var exeDept=dataNew.exeDept;
+            if(!exeDept){
+                exeDept=this.refs['lis'].state.ordData.exDeptList[0].pkDept;
+            }
+            var dtSamptype=dataNew.dtSamptype;
+            if(!dtSamptype){
+                dtSamptype=dataOld.dtSamptype;
+            }
+            var saveData={dtSamptype:dtSamptype,dtTubetype:dataOld.dtContype,dtColtype:dataOld.dtColltype,delFlag:"0",
+                dateStart:dataNew.startTime,codeApply:this.refs['lis'].state.ordData.codeApple[0],pkPv:null,pkPi:null,
+                pkDeptExec:exeDept,euStatusOrd:"0",pkOrd:dataOld.pkOrd,codeOrd:dataOld.code,nameOrd:dataOld.name,
+                codeOrdType:dataOld.codeOrdtype,flagBl:dataOld.flagCg,quan:1,flagEmer:"0",noteOrd:dataNew.note,
+                priceCg:dataOld.pricestr,euOrdtype:dataOld.euOrdtype};
+            var saveDataList=new Array();
+            saveDataList[0]=saveData;
+            var jsonData = {
+                labApplyList : saveDataList,
+                code : this.props.match.params.doctorCode,
+                codeIp : this.props.match.params.pkPv,
+                codeDept:this.props.currentDeptCode
+            };
+            $.ajax({
+                url: global.constants.nhisApi+"nhis/mobile/ord/saveLisApplyList",
+                //dataType: 'json',
+                data:{param:JSON.stringify(jsonData)} ,
+                type: "POST",
+                cache: false,
+                success: function(data) {
+                    console.log("保存成功");
+                    this.setState({
+                        visibleLis: false,
+                    });
+                    this.setState({loading: false });
+                }.bind(this),
+                error:function (data) {
+                    this.setState({loading: false });
+                }.bind(this)
+            });
+        }
+        // Modal.destroyAll();
     };
     handleCancelLis = e => {
         console.log(e);
@@ -254,9 +340,51 @@ class OrdSearch extends React.Component{
         window.history.back(-1)
     }
 
+
+    //整合诊疗数据
+    treatmentDataFactory(){
+        this.state.ordData.codeFreq = this.refs['treatment'].state.ordFreqCode;//频次
+        this.state.ordData.firstNum = this.refs['treatment'].state.first;//首日次数
+        this.state.ordData.quan = this.refs['treatment'].state.amount;//用量
+        this.state.ordData.noteOrd = this.refs['treatment'].state.note;//医嘱备注
+    }
+
+
+    //保存诊疗数据
+    saveTreatment(event) {
+        this.setState({loading: true });
+        console.log("保存开始");
+        console.log("保存的数据："+JSON.stringify(DiagTreatData))
+        var cnOrdList = [];
+        this.treatmentDataFactory();
+        var jsonData = {
+            cnOrdList : this.state.ordData,
+            code : this.props.match.params.doctorCode,
+            codeIp : this.props.match.params.pkPv,
+            saveType : 0,
+        };
+        $.ajax({
+            url: global.constants.nhisApi+"nhis/mobile/ord/save",
+            data:{ordList:JSON.stringify(jsonData)} ,
+            type: "POST",
+            cache: false,
+            success: function(data) {
+                console.log("保存成功");
+                this.setState({visibleDiagTreat: false });
+
+            }.bind(this),
+            error:function (data) {
+                console.log("保存失败");
+                this.setState({visibleDiagTreat: false });
+            }.bind(this)
+        });
+    }
+
+
     render(){
         return(
             <div>
+
                 <div >
                     <Row>
                         <Col span={12}>
@@ -291,13 +419,14 @@ class OrdSearch extends React.Component{
                 </div>
                 {/* 检查 */}
                 <div>
+
                     <Modal
                         title={this.state.modalTitle}
                         visible={this.state.visible} onCancel={this.handleCancel}
                         destroyOnClose={true}
                         footer={[
 
-                            <Button key="save" type="primary" onClick={(event,type) => this.handleOk(event,'ris')}>
+                            <Button key="save" type="primary" loading={this.state.loading} onClick={(event,type) => this.handleOk(event,'ris')}>
                                 保存
                             </Button>,
                             <Button key="back" onClick={this.handleCancel}>
@@ -313,13 +442,14 @@ class OrdSearch extends React.Component{
                     <Modal
                         title={this.state.modalTitle}
                         visible={this.state.visibleLis} onCancel={this.handleCancelLis}
+                        destroyOnClose={true}
                         // onOk={this.handleOk}
                         // onCancel={this.handleCancel}
                         footer={[
                             // <Button key="submit" type="primary" onClick={this.handleOk}>
                             //     签署
                             // </Button>,
-                            <Button key="save" type="primary" onClick={this.handleOk}>
+                            <Button key="save" type="primary" loading={this.state.loading} onClick={(event,type) => this.handleOkLis(event,'lis')} >
                                 保存
                             </Button>,
                             <Button key="back" onClick={this.handleCancelLis}>
@@ -327,7 +457,7 @@ class OrdSearch extends React.Component{
                             </Button>,
                         ]}
                     >
-                    <LisNew destroyModal={this.destroyModalLis.bind(this)} ordData={this.state.lisData}/>
+                    <LisNew ref={'lis'} destroyModal={this.destroyModalLis.bind(this)} ordData={this.state.lisData}/>
                     </Modal>
                 </div>
                 {/* 诊疗 */}
@@ -335,13 +465,14 @@ class OrdSearch extends React.Component{
                     <Modal
                         title={this.state.modalTitle}
                         visible={this.state.visibleDiagTreat} onCancel={this.handleCancelDiagTreat}
+                        destroyOnClose={true}
                         // onOk={this.handleOk}
                         // onCancel={this.handleCancel}
                         footer={[
                             // <Button key="submit" type="primary" onClick={this.handleOk}>
                             //     签署
                             // </Button>,
-                            <Button key="save" type="primary" onClick={this.handleOk}>
+                            <Button key="save" type="primary" onClick={this.saveTreatment.bind(this)}>
                                 保存
                             </Button>,
                             <Button key="back" onClick={this.handleCancelDiagTreat}>
@@ -349,7 +480,7 @@ class OrdSearch extends React.Component{
                             </Button>,
                         ]}
                     >
-                    <DiagTreat destroyModal={this.destroyModalDiagTreat.bind(this)} ordData={this.state.DiagTreatData}/>
+                    <DiagTreat ref={'treatment'} destroyModal={this.destroyModalDiagTreat.bind(this)} ordData={this.state.DiagTreatData}/>
                     </Modal>
                 </div>
 

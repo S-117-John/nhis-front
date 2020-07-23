@@ -172,11 +172,26 @@ class Home extends React.Component {
                     message: '提示',
                     description: result.msg,
                 });
-                this.setState({visibleStop: true,});
+                $.get(global.constants.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.hosId, function (result) {
+                    console.log(result);
+                    if (result.code == 400) {
+                        notification.open({
+                            message: '提示',
+                            description: result.msg,
+                        });
+                    }
+                    if (result.code == 200) {
+                        this.setState({
+                            tableData: result.data
+                        });
+                    }
+
+                }.bind(this))
+                this.setState({ visibleDel: false,});
             }
 
         }.bind(this));
-        this.setState({ visibleDel: false,});
+
       };
     //删除取消事件
       handleCancelDelOrder = e => {
@@ -331,7 +346,7 @@ class Home extends React.Component {
         const columns: ProColumns = [
             {
                 title: '组',
-                dataIndex: 'group',
+                dataIndex: 'sign',
                 width: 50,
                 fixed: 'left',
 
@@ -527,7 +542,7 @@ class Home extends React.Component {
                             <Col span={12}>
                                 <div>
                                     <Link
-                                        to={"/medicalAdviceSearch/" + this.props.match.params.hosId + "/" + this.props.match.params.doctorCode}>
+                                        to={"/medicalAdviceSearch/" + this.props.match.params.hosId + "/" + this.props.match.params.doctorCode+"/"+this.props.match.params.currentDeptCode}>
                                         <Button
                                         type="primary" style={{marginLeft: 20}}><PlusOutlined/>
                                         新医嘱</Button>
@@ -632,7 +647,7 @@ class Home extends React.Component {
 
                 </div>
                 <div>
-                    <Modal title="停嘱"  visible={this.state.visibleStop}
+                    <Modal title="停嘱"  visible={this.state.visibleStop} destroyOnClose={true}
                         onOk={this.handleOkStopOrder}  onCancel={this.handleCancelStopOrder}>
                             <Descriptions >
                                     <Descriptions.Item label="停嘱时间"> <DatePicker

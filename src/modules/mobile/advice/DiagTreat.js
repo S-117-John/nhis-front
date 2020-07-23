@@ -52,23 +52,24 @@ function listBdTermFreq() {
 class DiagTreat extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            ordData: this.props.ordData,
-            loading:false,
-            bdTermFreq: [],//频次列表
-        };
+
         listBdTermFreq = listBdTermFreq.bind(this);
         radioGroup = radioGroup.bind(this);
 
     }
 
     state = {
+        ordData: this.props.ordData,
+        loading:false,
+        bdTermFreq: [],//频次列表
+        ordFreqCode:'',//频次
         data: [],
-        ordData: null,
         treeData: [],
         listType:[],
-        loading: false,
-        bdTermFreq: [],//频次列表
+        first: '',//首
+        amount:'',//用量
+        exeDept:'',//执行科室
+        note:'',//备注
     }
 
     componentDidMount() {
@@ -115,6 +116,8 @@ class DiagTreat extends React.Component {
         this.props.destroyModal();
     }
 
+
+
     render() {
         return (
             <div>
@@ -125,15 +128,14 @@ class DiagTreat extends React.Component {
                             name="basic"
                         >
                             <div style={{textAlign:'left'}}>
-                                <span>
+                                <Space>
                                     <Radio.Group defaultValue="0" buttonStyle="solid" onChange={(event)=>radioGroup(event)}>
                                         <Radio.Button value="0">长期</Radio.Button>
                                         <Radio.Button value="1">临时</Radio.Button>
                                     </Radio.Group>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                </span>
-                                <span>开始时间<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                <span><Switch checkedChildren="开启" unCheckedChildren="关闭"  /></span>
+                                    <span>开始时间<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" /></span>
+                                    <Switch checkedChildren="开启" unCheckedChildren="关闭"  />
+                                </Space>
                             </div>
                             <div style={{textAlign:'center'}}>
                                 <h2>{this.state.ordData.dataList[0].NAME}</h2>
@@ -143,36 +145,33 @@ class DiagTreat extends React.Component {
                                 <br/>
                             </div>
 
-                            <Form.Item label="频次：" name="layout2">
+                            <Form.Item label="频次：">
                                 <Select  onSelect={(value=>this.state.ordFreqCode=value)}>
                                         {this.state.bdTermFreq.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
                                     </Select>
                             </Form.Item>
                             <Form.Item
                                 label="首"
-                                name="password"
-                                rules={[{required: false, message: 'Please input your password!'}]}
+                                rules={[{required: false, message: '请输入首次!'}]}
                             >
-                                <Input/>
+                                <Input onChange={event => this.state.first = event.target.value}/>
                             </Form.Item>
                             <Form.Item
                                 label="用量"
-                                name="password"
-                                rules={[{required: false, message: 'Please input your password!'}]}
+                                rules={[{required: false, message: '请输入用量!'}]}
                             >
-                                <Input addonAfter={this.state.ordData.unitPackName} value = {this.state.ordData.packSize}/>
+                                <Input addonAfter={this.state.ordData.unitPackName} onChange={event => this.state.amount = event.target.value}/>
                             </Form.Item>
-                            <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]} name="exDept">
-                                <Select>
+                            <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]}>
+                                <Select onSelect={(value=>this.state.exeDept=value)}>
                                     {this.state.ordData.exDeptList.map((item,index) => <Option  key={item.PK_DEPT} value={item.PK_DEPT} >{item.NAME_DEPT}</Option>)}
                                 </Select>
                             </Form.Item>
                             <Form.Item
                                 label="备注"
-                                name="password"
-                                rules={[{required: false, message: 'Please input your password!'}]}
+                                rules={[{required: false, message: '请输入备注!'}]}
                             >
-                                <Input/>
+                                <Input onChange={event => this.state.note = event.target.value}/>
                             </Form.Item>
                         </Form>
                     </div>

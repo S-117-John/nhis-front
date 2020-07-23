@@ -48,7 +48,11 @@ class LisNew extends React.Component {
         ordData: null,
         treeData: [],
         listType:[],
-        loading: false
+        loading: false,
+        startTime:null,//开始时间
+        exeDept:null,//执行科室
+        dtSamptype:null,//标本类型
+        note:null,//备注
     }
 
     componentDidMount() {
@@ -130,23 +134,23 @@ class LisNew extends React.Component {
 
                         >
 
-                            <Form.Item name="date-time-picker" label="开始时间" {...dateTimeonfig}>
+                            <Form.Item name="date-time-picker" label="开始时间" {...dateTimeonfig} onChange={(data,dateString)=>this.state.startTime=dateString} >
                                 <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
                             </Form.Item>
 
                             <div style={{textAlign:'center'}}>
-                                <h1>{this.state.ordData.dataList[0].NAME}</h1>
-                                <span>类型：{this.state.ordData.dataList[0].NAME_SAMPTYPE}   单价: {this.state.ordData.dataList[0].PRICESTR} 申请单号：{this.state.ordData.codeApple[0]}</span>
+                                <h1>{this.state.ordData.dataList[0].name}</h1>
+                                <span>类型：{this.state.ordData.dataList[0].nameSamptype}   单价: {this.state.ordData.dataList[0].pricestr} 申请单号：{this.state.ordData.codeApple[0]}</span>
                                 <br/>
                             </div>
-                            <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]} name="exDept">
-                                <Select style={{ width: 290 }} defaultValue={this.state.ordData.exDeptList[0].PK_DEPT}>
-                                    {this.state.ordData.exDeptList.map((item,index) => <Option  key={item.PK_DEPT} value={item.PK_DEPT} >{item.NAME_DEPT}</Option>)}
+                            <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]} name="exDept" onSelect={value=>this.state.exeDept=value}  >
+                                <Select style={{ width: 290 }} defaultValue={this.state.ordData.exDeptList[0].pkDept}>
+                                    {this.state.ordData.exDeptList.map((item,index) => <Option  key={item.pkDept} value={item.pkDept} >{item.nameDept}</Option>)}
                                 </Select>
                             </Form.Item>
                             <Form.Item label="标本类型"  name="dtType">
-                                <Select style={{ width: 290 }} defaultValue={this.state.ordData.dataList[0].DT_SAMPTYPE} >
-                                    {this.state.ordData.listType.map((item,index) => <Option  key={item.CODE} value={item.CODE} >{item.NAME}</Option>)}
+                                <Select style={{ width: 290 }} defaultValue={this.state.ordData.dataList[0].dtSamptype} onSelect={value=>this.state.dtSamptype=value}>
+                                    {this.state.ordData.listType.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
                                 </Select>
                             </Form.Item>
                             <Form.Item
@@ -161,7 +165,7 @@ class LisNew extends React.Component {
                                 name="password"
                                 rules={[{required: false, message: 'Please input your password!'}]}
                             >
-                                <Input/>
+                                <Input onChange={event => this.state.note = event.target.value}/>
                             </Form.Item>
                         </Form>
                     </div>
