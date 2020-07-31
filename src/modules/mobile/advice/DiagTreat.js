@@ -38,22 +38,12 @@ function radioGroup(e) {
     console.log(e.target.value);
     this.state.euAlways = e.target.value;
 }
-//频次
-function listBdTermFreq() {
-    $.ajax({
-        url: global.constants.nhisApi+"nhis/mobile/bd/term/freq",
-        dataType: 'json',
-        cache: false,
-        success: function(data) {
-            this.setState({bdTermFreq: data.data});
-        }.bind(this)
-    });
-}
+
 class DiagTreat extends React.Component {
     constructor(props) {
         super(props);
 
-        listBdTermFreq = listBdTermFreq.bind(this);
+        this.listBdTermFreq();
         radioGroup = radioGroup.bind(this);
 
     }
@@ -70,17 +60,27 @@ class DiagTreat extends React.Component {
         amount:'',//用量
         exeDept:'',//执行科室
         note:'',//备注
+        dateStart:null,//开始时间
     }
 
     componentDidMount() {
-        listBdTermFreq();
-        console.log("医嘱ord:" + this.props.doctorCode);
     }
 
     componentWillUnmount() {
-        console.log("销毁")
+        this.setState = ()=>false;
     }
 
+    //频次
+    listBdTermFreq() {
+        $.ajax({
+            url: window.g.nhisApi+"nhis/mobile/bd/term/freq",
+            dataType: 'json',
+            cache: false,
+            success: function(data) {
+                this.setState({bdTermFreq: data.data});
+            }.bind(this)
+        });
+    }
 
     onLoadData = treeNode => {
         const {treeData} = this.state;
@@ -133,15 +133,15 @@ class DiagTreat extends React.Component {
                                         <Radio.Button value="0">长期</Radio.Button>
                                         <Radio.Button value="1">临时</Radio.Button>
                                     </Radio.Group>
-                                    <span>开始时间<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" /></span>
+                                    <span>开始时间<DatePicker showTime format="YYYY-MM-DD HH:mm:ss"  onChange={(date,dateString)=>this.setState({dateStart: dateString})} /></span>
                                     <Switch checkedChildren="开启" unCheckedChildren="关闭"  />
                                 </Space>
                             </div>
                             <div style={{textAlign:'center'}}>
-                                <h2>{this.state.ordData.dataList[0].NAME}</h2>
-                                <span>编码：{this.state.ordData.dataList[0].CODE}   单价: {this.state.ordData.dataList[0].PRICESTR} </span>
+                                <h2>{this.state.ordData.nameOrd}</h2>
+                                <span>编码：{this.state.ordData.codeOrd}   单价: {this.state.ordData.price} </span>
                                 <br/>
-                                <span>备注：{this.state.ordData.dataList[0].DESCORD} </span>
+                                <span>备注：{this.state.ordData.noteOrd} </span>
                                 <br/>
                             </div>
 
@@ -164,7 +164,7 @@ class DiagTreat extends React.Component {
                             </Form.Item>
                             <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]}>
                                 <Select onSelect={(value=>this.state.exeDept=value)}>
-                                    {this.state.ordData.exDeptList.map((item,index) => <Option  key={item.PK_DEPT} value={item.PK_DEPT} >{item.NAME_DEPT}</Option>)}
+                                    {/*{this.state.ordData.exDeptList.map((item,index) => <Option  key={item.PK_DEPT} value={item.PK_DEPT} >{item.NAME_DEPT}</Option>)}*/}
                                 </Select>
                             </Form.Item>
                             <Form.Item

@@ -72,7 +72,7 @@ class DrugSearch extends React.Component{
         console.log(value);
         if(value!=""){
             $.ajax({
-                url: global.constants.nhisApi+"/nhis/mobile/ord/search?spCode="+value,
+                url: window.g.nhisApi+"/nhis/mobile/ord/search?spCode="+value,
                 dataType: 'json',
                 cache: false,
                 success: function(data) {

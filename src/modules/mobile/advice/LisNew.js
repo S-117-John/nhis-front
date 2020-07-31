@@ -86,7 +86,7 @@ class LisNew extends React.Component {
     // 获取检查模板
     listEmpOrd() {
         $.ajax({
-            url: global.constants.nhisApi + "nhis/mobile/ord/ris/temp",
+            url: window.g.nhisApi + "nhis/mobile/ord/ris/temp",
             dataType: 'json',
             cache: false,
             success: function (data) {

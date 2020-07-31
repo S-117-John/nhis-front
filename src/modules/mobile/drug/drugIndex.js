@@ -20,7 +20,7 @@ const ordDataList=[];
 //频次
 function listBdTermFreq() {
     $.ajax({
-        url: global.constants.nhisApi+"nhis/mobile/bd/term/freq",
+        url: window.g.nhisApi+"nhis/mobile/bd/term/freq",
         dataType: 'json',
         cache: false,
         success: function(data) {
@@ -32,7 +32,7 @@ function listBdTermFreq() {
 // 医嘱用法
 function listSupply() {
     $.ajax({
-        url: global.constants.nhisApi+"nhis/mobile/bd/supply",
+        url: window.g.nhisApi+"nhis/mobile/bd/supply",
         dataType: 'json',
         cache: false,
         success: function(data) {
@@ -108,7 +108,7 @@ class DrugIndex extends React.Component{
     //查询药品明细
     getBdPd(pkPd) {
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/drug/list?ids="+pkPd,
+            url: window.g.nhisApi+"nhis/mobile/drug/list?ids="+pkPd,
             dataType: 'json',
             cache: false,
             success: function(data) {
@@ -126,7 +126,7 @@ class DrugIndex extends React.Component{
         });
         //根据药品主键查询药品信息
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/drug?pkPd="+key,
+            url: window.g.nhisApi+"nhis/mobile/drug?pkPd="+key,
             dataType: 'json',
             cache: false,
             success: function(data) {
@@ -200,7 +200,7 @@ class DrugIndex extends React.Component{
             saveType : 1,
         };
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/ord/save",
+            url: window.g.nhisApi+"nhis/mobile/ord/save",
             data:{ordList:JSON.stringify(jsonData)} ,
             type: "POST",
             cache: false,
@@ -237,7 +237,7 @@ class DrugIndex extends React.Component{
     };
     debugger;
     $.ajax({
-        url: global.constants.nhisApi+"nhis/mobile/ord/save",
+        url: window.g.nhisApi+"nhis/mobile/ord/save",
         data:{ordList:JSON.stringify(jsonData)} ,
         type: "POST",
         cache: false,

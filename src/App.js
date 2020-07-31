@@ -1,7 +1,6 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import './modules/mobile/config/config'
 import {BrowserRouter as Router,Route} from "react-router-dom";
 import Home from "./modules/mobile/home/home";
 import MedicalAdvice from "./modules/mobile/advice/medicalAdvice";

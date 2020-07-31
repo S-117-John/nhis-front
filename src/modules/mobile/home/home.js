@@ -1,31 +1,36 @@
 import React from 'react';
-import {Button, Col, Row, Space, Table, Tag, notification, Radio, Drawer, Descriptions, Divider,Modal,DatePicker} from "antd";
+import {
+    Button,
+    Col,
+    Row,
+    Tag,
+    notification,
+    Radio,
+    Drawer,
+    Descriptions,
+    Divider,
+    Modal,
+    DatePicker,
+    message
+} from "antd";
 import $ from 'jquery'
 import Head from "../common/head";
 import {Link} from "react-router-dom";
-import ProTable, {ProColumns, TableDropdown} from '@ant-design/pro-table';
-import {PlusOutlined,StopOutlined,DeleteOutlined,EditOutlined} from '@ant-design/icons';
+import ProTable, {ProColumns} from '@ant-design/pro-table';
+import {PlusOutlined, StopOutlined, DeleteOutlined, EditOutlined,ExclamationCircleOutlined} from '@ant-design/icons';
 import moment from 'moment';
-import "./home.css"
+import styles from "./home.css"
 import StopOrdItem from "./stopOrdItem";
-import { Alert ,message} from 'antd';
+// import styles from './home.less';
 
-const tableData = [
-    {
-        bdOrdType: {name: ''}
-    }
-];
-const ordStopDataList=[];
+const ordStopDataList = [];
 
-// function stopOrder1(event) {
-//     debugger
-// }
+const { confirm } = Modal;
 
 class Home extends React.Component {
 
     constructor(props) {
         super(props);
-        //stopOrder1=stopOrder1().bind(this)
     }
 
     state = {
@@ -33,112 +38,99 @@ class Home extends React.Component {
         selectedRowKeys: [],
         filteredInfo: null,
         drawerVisible: false,
-        ordDetail: {nameOrd:'',euAlways:'',dateStart:'',codeFreq:''},
+        ordDetail: {nameOrd: '', euAlways: '', dateStart: '', codeFreq: ''},
         visibleStop: false,
         visibleDel: false,
-        ordStopDataList:ordStopDataList
-    };
-    componentDidMount() {
-        console.log("住院号" + this.props.match.params.hosId);
+        ordStopDataList: ordStopDataList,
+        record: null,//选中行记录
+        selected: null,//选中状态
+        stopTime:null,//停止时间
+        isDisabled:false,//按钮不可用
+        api:window.g
 
+    };
+
+    componentDidMount() {
         this.listPatientOrder();
     }
 
     componentWillUnmount() {
         this.serverRequest.abort();
     }
-    //停嘱
+
+    //停止医嘱
     stopOrder(event) {
-        var count=this.state.selectedRowKeys.length;
-        if(count==0){
+        let count = this.state.selectedRowKeys.length;
+        if(count === 0) {
             notification.open({
                 message: '提示',
                 description: "请选择数据",
             });
             return;
         }
-        var ids="";
-        for(var i=0;i<this.state.selectedRowKeys.length;i++){
-            if(i==0){
-                ids=ids+"'"+this.state.selectedRowKeys[i]+"'";
-            }else{
-                ids=ids+",'"+this.state.selectedRowKeys[i]+"'";
-            }
-        }
-        $.get(global.constants.nhisApi + "nhis/mobile/ord/queryStopOrdList?pkCnords=" + ids, function (result) {
-            console.log(result);
-            if (result.code == 400) {
-                notification.open({
-                    message: '提示',
-                    description: result.msg,
-                });
-            }
-            if (result.code == 200) {
-                this.setState({
-                    ordStopDataList: result.data
-                });
-                this.setState({visibleStop: true,});
-            }
-
-        }.bind(this));
-
-
+        let newArray = this.state.tableData.filter((item,index,arr)=>{return this.state.selectedRowKeys.indexOf(item.pkCnord)>-1;});
+        this.setState({
+            visibleStop: true,
+            ordStopDataList: newArray
+        });
     }
-    handleOkStopOrder = e => {
-        console.log(e);
-        this.setState({
-            visibleStop: false,
-        });
-      };
 
-      handleCancelStopOrder = e => {
-        console.log(e);
+    //确定停止医嘱
+    handleOkStopOrder = e => {
+        this.state.ordStopDataList.map((value, index) => {
+            value.dateStop = this.state.stopTime;
+        });
+        $.ajax({
+            url: this.state.api.nhisApi+"nhis/mobile/ord/stop",
+            type:"PUT",
+            data: {param:JSON.stringify(this.state.ordStopDataList)},
+            success: function(data) {
+                message.info('执行成功');
+                this.listPatientOrder();
+
+            }.bind(this)
+        });
+
+        this.setState({visibleStop: false,});
+    };
+
+    handleCancelStopOrder = e => {
         this.setState({
             visibleStop: false,
         });
-      };
+    };
+
     //签署
     signOrder(event) {
-        var count=this.state.selectedRowKeys.length;
-        if(count==0){
+        var count = this.state.selectedRowKeys.length;
+        if (count == 0) {
             notification.open({
                 message: '提示',
                 description: "请选择数据",
             });
             return;
         }
-        var ids="";
-        for(var i=0;i<this.state.selectedRowKeys.length;i++){
-            if(i==0){
-                ids=ids+"'"+this.state.selectedRowKeys[i]+"'";
-            }else{
-                ids=ids+",'"+this.state.selectedRowKeys[i]+"'";
-            }
+        //获取选中医嘱
+        let newArray = this.state.tableData.filter((item,index,arr)=>{return this.state.selectedRowKeys.indexOf(item.pkCnord)>-1;});
+        let data = {
+            cnOrdList:newArray
         }
-        $.get(global.constants.nhisApi + "nhis/mobile/ord/signOrder?pkCnords=" + ids+"&doctorCode="+this.props.match.params.doctorCode, function (result) {
-            console.log(result);
-            if (result.code == 400) {
-                notification.open({
-                    message: '提示',
-                    description: result.msg,
-                });
-            }
-            if (result.code == 200) {
-                notification.open({
-                    message: '提示',
-                    description: result.msg,
-                });
-                this.setState({visibleStop: true,});
-            }
+        $.ajax({
+            url: this.state.api.nhisApi+"nhis/mobile/ord/sign",
+            type:"PUT",
+            data: {param:JSON.stringify(data)},
+            success: function(data) {
+                message.info('执行成功');
+                this.listPatientOrder();
 
-        }.bind(this));
-
-
+            }.bind(this)
+        });
     }
+
     //删除
     delOrder(event) {
-        var count=this.state.selectedRowKeys.length;
-        if(count==0){
+        var count = this.state.selectedRowKeys.length;
+        if (count == 0) {
             notification.open({
                 message: '提示',
                 description: "请选择数据",
@@ -147,19 +139,19 @@ class Home extends React.Component {
         }
         this.setState({visibleDel: true,});
     }
+
     //删除确实事件
     handleOkDelOrder = e => {
         console.log(e);
-        var ids="";
-        for(var i=0;i<this.state.selectedRowKeys.length;i++){
-            if(i==0){
-                ids=ids+"'"+this.state.selectedRowKeys[i]+"'";
-            }else{
-                ids=ids+",'"+this.state.selectedRowKeys[i]+"'";
+        var ids = "";
+        for (var i = 0; i < this.state.selectedRowKeys.length; i++) {
+            if (i == 0) {
+                ids = ids + "'" + this.state.selectedRowKeys[i] + "'";
+            } else {
+                ids = ids + ",'" + this.state.selectedRowKeys[i] + "'";
             }
         }
-        $.get(global.constants.nhisApi + "nhis/mobile/ord/delOrder?pkCnords=" + ids+"&doctorCode="+this.props.match.params.doctorCode, function (result) {
-            console.log(result);
+        $.get(this.state.api.nhisApi + "nhis/mobile/ord/delOrder?pkCnords=" + ids + "&doctorCode=" + this.props.match.params.doctorCode, function (result) {
             if (result.code == 400) {
                 notification.open({
                     message: '提示',
@@ -172,8 +164,7 @@ class Home extends React.Component {
                     message: '提示',
                     description: result.msg,
                 });
-                $.get(global.constants.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.hosId, function (result) {
-                    console.log(result);
+                $.get(this.state.api.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.hosId, function (result) {
                     if (result.code == 400) {
                         notification.open({
                             message: '提示',
@@ -187,27 +178,27 @@ class Home extends React.Component {
                     }
 
                 }.bind(this))
-                this.setState({ visibleDel: false,});
+                this.setState({visibleDel: false,});
             }
 
         }.bind(this));
 
-      };
+    };
     //删除取消事件
-      handleCancelDelOrder = e => {
+    handleCancelDelOrder = e => {
         console.log(e);
         this.setState({
             visibleDel: false,
         });
-      };
-      //销毁弹出框
-    // destroyModal(){
-    //     Modal.destroyAll();
-    // }
+    };
+
     listPatientOrder() {
-        this.serverRequest = $.get(global.constants.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.hosId, function (result) {
-            console.log(result);
+        this.serverRequest = $.get(this.state.api.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.hosId, function (result) {
+
             if (result.code == 400) {
+                this.setState({
+                    isDisabled:true
+                })
                 notification.open({
                     message: '提示',
                     description: result.msg,
@@ -223,53 +214,48 @@ class Home extends React.Component {
     }
 
     handleChange = (pagination, filters, sorter) => {
-        console.log('Various parameters', pagination, filters, sorter);
         this.setState({
             filteredInfo: filters,
             sortedInfo: sorter,
         });
     };
 
-    onSelectChange = selectedRowKeys => {
-        console.log('selectedRowKeys changed: ', selectedRowKeys);
-        this.setState({selectedRowKeys});
-    };
 
     RadioGroup = (e) => {
         console.log(e.target.value);
         var type = e.target.value
         switch (type) {
             case 'a':
-                if(this.state.filteredInfo){
-                    this.state.filteredInfo.euAlways= ['0', '1']
+                if (this.state.filteredInfo) {
+                    this.state.filteredInfo.euAlways = ['0', '1']
                     this.setState({
                         filteredInfo: this.state.filteredInfo,
                     });
-                }else{
+                } else {
                     this.setState({
                         filteredInfo: {euAlways: ['0', '1']},
                     });
                 }
                 break;
             case 'b':
-                if(this.state.filteredInfo){
-                    this.state.filteredInfo.euAlways= ['1']
+                if (this.state.filteredInfo) {
+                    this.state.filteredInfo.euAlways = ['1']
                     this.setState({
                         filteredInfo: this.state.filteredInfo,
                     });
-                }else{
+                } else {
                     this.setState({
                         filteredInfo: {euAlways: ['1']},
                     });
                 }
                 break;
             case 'c':
-                if(this.state.filteredInfo){
-                    this.state.filteredInfo.euAlways= ['0']
+                if (this.state.filteredInfo) {
+                    this.state.filteredInfo.euAlways = ['0']
                     this.setState({
                         filteredInfo: this.state.filteredInfo,
                     });
-                }else{
+                } else {
                     this.setState({
                         filteredInfo: {euAlways: ['0']},
                     });
@@ -284,24 +270,24 @@ class Home extends React.Component {
         var type = e.target.value
         switch (type) {
             case 'a':
-                if(this.state.filteredInfo){
-                    this.state.filteredInfo.isnow= ['0', '1']
+                if (this.state.filteredInfo) {
+                    this.state.filteredInfo.isnow = ['0', '1']
                     this.setState({
                         filteredInfo: this.state.filteredInfo,
                     });
-                }else{
+                } else {
                     this.setState({
                         filteredInfo: {isnow: ['0', '1']},
                     });
                 }
                 break;
             case 'b':
-                if(this.state.filteredInfo){
-                    this.state.filteredInfo.isnow=['1']
+                if (this.state.filteredInfo) {
+                    this.state.filteredInfo.isnow = ['1']
                     this.setState({
                         filteredInfo: this.state.filteredInfo,
                     });
-                }else{
+                } else {
                     this.setState({
                         filteredInfo: {isnow: ['1']},
                     });
@@ -313,18 +299,17 @@ class Home extends React.Component {
     showDrawer = (record) => {
         console.log(record)
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/ord/detail",
+            url: this.state.api.nhisApi + "nhis/mobile/ord/detail",
             dataType: 'json',
-            data:{pkCnOrd:record.pkCnord},
+            data: {pkCnOrd: record.pkCnord},
             cache: false,
-            success: function(data) {
+            success: function (data) {
                 this.setState({
                     visible: true,
                     ordDetail: data.data
                 });
             }.bind(this)
         });
-
 
 
     };
@@ -335,11 +320,83 @@ class Home extends React.Component {
         });
     };
 
+
+    //选中项发生变化时的回调
+    onSelectChange = (selectedRowKeys, selectedRows) => {
+        this.setState({selectedRowKeys});
+    };
+
+
+    //用户手动选择/取消选择某行的回调
+    rowSelect(record, selected, selectedRows, nativeEvent) {
+        this.setState({
+            record: record,
+            selected: selected
+        })
+        // if(!selected){
+        //     console.log('选中的项'+this.state.selectedRowKeys)
+        //     let pNo = record.ordsnParent;
+        //     this.state.tableData.map((item,index)=>{
+        //         if(item.ordsnParent==pNo){
+        //             //获取元素位置
+        //             var index = this.state.selectedRowKeys.indexOf(item.pkCnOrd)
+        //             this.state.selectedRowKeys.splice(index,1);
+        //
+        //         }
+        //     });
+        //     let newArray = this.state.selectedRowKeys;
+        //     console.log('选中后的项'+this.state.selectedRowKeys)
+        //     this.setState({
+        //         selectedRowKeys:newArray
+        //     })
+        // }else{
+        //     console.log('选中项')
+        //     this.state.tableData.map((item,index)=>{
+        //         if(item.ordsnParent==record.ordsnParent){
+        //             console.log(item.ordsnParent+"/"+record.ordsnParent);
+        //
+        //             this.state.selectedRowKeys.push(item.pkCnord)
+        //
+        //         }
+        //     });
+        //     console.log('a-'+ this.state.selectedRowKeys)
+        //     let selectedRowKeys = this.state.selectedRowKeys.filter((item,index,arr)=>{
+        //         return arr.indexOf(item,0)===index;
+        //     })
+        //
+        //     // this.setState({selectedRowKeys:newArray});
+        //     this.setState({selectedRowKeys});
+        // }
+    }
+
+    //确认删除
+    showDeletePromiseConfirm() {
+        confirm({
+            title: '确认删除当前医嘱?',
+            icon: <ExclamationCircleOutlined />,
+            content: '',
+            onOk() {
+                return new Promise((resolve, reject) => {
+                    setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
+                }).catch(() => console.log('Oops errors!'));
+            },
+            onCancel() {},
+        });
+    }
+
+    //设置按钮不可用
+    setBtnDisable(result){
+        this.setState({
+            isDisabled:result
+        })
+    }
+
     render() {
         const {loading, selectedRowKeys} = this.state;
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange,
+            onSelect: (record, selected, selectedRows, nativeEvent) => this.rowSelect(record, selected, selectedRows, nativeEvent)
         };
         let {filteredInfo} = this.state;
         filteredInfo = filteredInfo || {};
@@ -498,7 +555,7 @@ class Home extends React.Component {
                 title: '操作',
                 dataIndex: 'action',
                 render: (text, record) => (
-                    <a href="#!"  onClick={()=>this.showDrawer(record)}>详情</a>
+                    <a href="#!" onClick={() => this.showDrawer(record)}>详情</a>
                 ),
                 fixed: 'right',
                 width: 100
@@ -508,13 +565,11 @@ class Home extends React.Component {
         ];
 
 
-
-
         return (
             <div>
                 <div style={{margin: 20}}>
 
-                    <Head pkPv={this.props.match.params.hosId} doctorCode={this.props.match.params.doctorCode}/>
+                    <Head pkPv={this.props.match.params.hosId} doctorCode={this.props.match.params.doctorCode} setBtnDisable={this.setBtnDisable}/>
 
                     <Divider/>
 
@@ -542,14 +597,24 @@ class Home extends React.Component {
                             <Col span={12}>
                                 <div>
                                     <Link
-                                        to={"/medicalAdviceSearch/" + this.props.match.params.hosId + "/" + this.props.match.params.doctorCode+"/"+this.props.match.params.currentDeptCode}>
+                                        to={"/medicalAdviceSearch/" + this.props.match.params.hosId + "/" + this.props.match.params.doctorCode + "/" + this.props.match.params.currentDeptCode}>
                                         <Button
-                                        type="primary" style={{marginLeft: 20}}><PlusOutlined/>
-                                        新医嘱</Button>
+                                            disabled={this.state.isDisabled}
+                                            type="primary" style={{marginLeft: 20}}><PlusOutlined/>
+                                            新医嘱</Button>
                                     </Link>
-                                    <Button type="primary" onClick={(event)=>this.stopOrder(event)} style={{marginLeft: 20}}><StopOutlined />停嘱</Button>
-                                    <Button type="primary" onClick={(event)=>this.signOrder(event)} style={{marginLeft: 20}}><EditOutlined />签署</Button>
-                                    <Button type="primary" onClick={(event)=>this.delOrder(event)} style={{marginLeft: 20}}><DeleteOutlined />删除</Button>
+                                    <Button
+                                        disabled={this.state.isDisabled}
+                                        type="primary" onClick={(event) => this.stopOrder(event)}
+                                            style={{marginLeft: 20}}><StopOutlined/>停嘱</Button>
+                                    <Button
+                                        disabled={this.state.isDisabled}
+                                        type="primary" onClick={(event) => this.signOrder(event)}
+                                            style={{marginLeft: 20}}><EditOutlined/>签署</Button>
+                                    <Button
+                                        disabled={this.state.isDisabled}
+                                        type="primary" onClick={(event) => this.delOrder(event)}
+                                            style={{marginLeft: 20}}><DeleteOutlined/>删除</Button>
                                 </div>
 
                             </Col>
@@ -567,9 +632,11 @@ class Home extends React.Component {
                                 rowSelection={rowSelection}
                                 onChange={this.handleChange}
                                 rowKey={record => record.key}
-                                tableAlertRender={({ selectedRowKeys, selectedRows }) =>{
-                                    return(
-                                        <div style={{ textAlign:"left"}}>
+                                // rowClassName={styles.polarGreen2}
+                                rowClassName={record => (record.flagSign == '1' ? 'polarGreen2' : '')}
+                                tableAlertRender={({selectedRowKeys, selectedRows}) => {
+                                    return (
+                                        <div style={{textAlign: "left"}}>
                                             当前共选中{selectedRowKeys.length} 项
                                         </div>
                                     );
@@ -585,9 +652,9 @@ class Home extends React.Component {
                                     // );
                                 }}
                                 tableAlertOptionRender={(props) => {
-                                    const { onCleanSelected } = props;
+                                    const {onCleanSelected} = props;
                                     return (
-                                        <div style={{ textAlign:"right"}}>
+                                        <div style={{textAlign: "right"}}>
                                             <a onClick={onCleanSelected}>清空</a>
                                         </div>
                                     );
@@ -607,7 +674,8 @@ class Home extends React.Component {
 
                         <div>
                             <Descriptions column={1}>
-                                <Descriptions.Item label="医嘱期效">{this.state.ordDetail.euAlways==='1'?'临时':'长期'}</Descriptions.Item>
+                                <Descriptions.Item
+                                    label="医嘱期效">{this.state.ordDetail.euAlways === '1' ? '临时' : '长期'}</Descriptions.Item>
                                 <Descriptions.Item label="开始时间">{this.state.ordDetail.dateStart}</Descriptions.Item>
                                 <Descriptions.Item label="医嘱内容">{this.state.ordDetail.nameOrd}</Descriptions.Item>
                                 {/* <Descriptions.Item label="频次">{this.state.ordDetail.nameFreq}</Descriptions.Item> */}
@@ -619,13 +687,14 @@ class Home extends React.Component {
                             </Descriptions>
                             <Divider/>
                             <Descriptions column={1}>
-                            <Descriptions.Item label="录入人">{this.state.ordDetail.nameEmpInput}</Descriptions.Item>
+                                <Descriptions.Item label="录入人">{this.state.ordDetail.nameEmpInput}</Descriptions.Item>
                                 <Descriptions.Item label="录入时间">{this.state.ordDetail.dateEnter}</Descriptions.Item>
                                 <Descriptions.Item label="开立医生">{this.state.ordDetail.nameEmpOrd}</Descriptions.Item>
                                 <Descriptions.Item label="核对人">{this.state.ordDetail.nameEmpChk}</Descriptions.Item>
                                 <Descriptions.Item label="核对时间">{this.state.ordDetail.dateChk}</Descriptions.Item>
                                 <Descriptions.Item label="计划执行时间">{this.state.ordDetail.datePlanEx}</Descriptions.Item>
-                                <Descriptions.Item label="最后一次执行时间">{this.state.ordDetail.dateLastEx}</Descriptions.Item>
+                                <Descriptions.Item
+                                    label="最后一次执行时间">{this.state.ordDetail.dateLastEx}</Descriptions.Item>
                             </Descriptions>
                             {/* <Descriptions column={1}>
                                 <Descriptions.Item label="执行时间">1</Descriptions.Item>
@@ -646,32 +715,31 @@ class Home extends React.Component {
                     </Drawer>
 
                 </div>
-                <div>
-                    <Modal title="停嘱"  visible={this.state.visibleStop} destroyOnClose={true}
-                        onOk={this.handleOkStopOrder}  onCancel={this.handleCancelStopOrder}>
-                            <Descriptions >
-                                    <Descriptions.Item label="停嘱时间"> <DatePicker
-                                         format="YYYY-MM-DD HH:mm:ss"
-                                         showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
-                                /></Descriptions.Item>
-                            </Descriptions>
-
-                            <Divider/>
-                    <div style={{marginTop:15}}>
-                        {this.state.ordStopDataList.map((item,index) => <StopOrdItem ordData={item} key={index}/>)}
+                <Modal title="停嘱" visible={this.state.visibleStop} destroyOnClose={true}
+                       onOk={this.handleOkStopOrder} onCancel={()=>{this.setState({visibleStop: false})}}>
+                    <Descriptions>
+                        <Descriptions.Item label="停嘱时间">
+                            <DatePicker
+                            format="YYYY-MM-DD HH:mm:ss"
+                            showTime={{defaultValue: moment('00:00:00', 'HH:mm:ss')}}
+                            onChange={(date,dateString)=>this.setState({stopTime:dateString})}
+                        />
+                        </Descriptions.Item>
+                    </Descriptions>
+                    <Divider/>
+                    <div style={{marginTop: 15}}>
+                        {this.state.ordStopDataList.map((item, index) => <StopOrdItem ordData={item} key={index}/>)}
                     </div>
-                    {/* <StopOrdItem destroyModal={this.destroyModal.bind(this)}/> */}
-                    </Modal>
-                </div>
-                <div>
-                    <Modal title="删除"  visible={this.state.visibleDel}
-                        onOk={this.handleOkDelOrder}  onCancel={this.handleCancelDelOrder}>
-                           <p>确认删除所选医嘱吗？</p>
-                    </Modal>
-                </div>
+                </Modal>
+                <Modal title="删除" visible={this.state.visibleDel}
+                       onOk={this.handleOkDelOrder} onCancel={this.handleCancelDelOrder}>
+                    <p>确认删除所选医嘱吗？</p>
+                </Modal>
             </div>
         );
     }
+
+
 }
 
 export default Home;

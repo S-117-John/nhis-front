@@ -68,7 +68,7 @@ class OrdSearch extends React.Component{
             this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.props.currentDeptCode+"/"+this.state.listPkPd);
         }
         else if(record.codeOrdType!=null&&record.codeOrdType=='02'){
-            $.get(global.constants.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
+            $.get(window.g.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
                 console.log(result);
                 if (result.code == 200) {
                     this.setState({
@@ -80,7 +80,7 @@ class OrdSearch extends React.Component{
             }.bind(this));
 
         }else if(record.codeOrdType!=null&&record.codeOrdType=='03'){
-            $.get(global.constants.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
+            $.get(window.g.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
                 console.log(result);
                 if (result.code == 200) {
                     this.setState({
@@ -92,16 +92,11 @@ class OrdSearch extends React.Component{
             }.bind(this));
 
         }else{//诊疗
-            $.get(global.constants.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
-                console.log(result);
-                if (result.code == 200) {
-                    this.setState({
-                        DiagTreatData: result.data
-                    });
-                    this.showModalDiagTreat('新开诊疗项目');
-                }
-
-            }.bind(this));
+            record.pkOrd = record.key;
+            this.setState({
+                DiagTreatData: record
+            });
+            this.showModalDiagTreat('新开诊疗项目');
 
         }
     }
@@ -212,7 +207,7 @@ class OrdSearch extends React.Component{
                 codeDept:this.props.currentDeptCode
             };
             $.ajax({
-                url: global.constants.nhisApi+"nhis/mobile/ord/saveRisApplyList",
+                url: window.g.nhisApi+"nhis/mobile/ord/saveRisApplyList",
                 //dataType: 'json',
                 data:{param:JSON.stringify(jsonData)} ,
                 type: "POST",
@@ -267,7 +262,7 @@ class OrdSearch extends React.Component{
                 codeDept:this.props.currentDeptCode
             };
             $.ajax({
-                url: global.constants.nhisApi+"nhis/mobile/ord/saveLisApplyList",
+                url: window.g.nhisApi+"nhis/mobile/ord/saveLisApplyList",
                 //dataType: 'json',
                 data:{param:JSON.stringify(jsonData)} ,
                 type: "POST",
@@ -303,7 +298,7 @@ class OrdSearch extends React.Component{
         console.log(value);
         if(value!=""){
             $.ajax({
-                url: global.constants.nhisApi+"/nhis/mobile/ord/search?spCode="+value,
+                url: window.g.nhisApi+"/nhis/mobile/ord/search?spCode="+value,
                 dataType: 'json',
                 cache: false,
                 success: function(data) {
@@ -343,10 +338,12 @@ class OrdSearch extends React.Component{
 
     //整合诊疗数据
     treatmentDataFactory(){
-        this.state.ordData.codeFreq = this.refs['treatment'].state.ordFreqCode;//频次
-        this.state.ordData.firstNum = this.refs['treatment'].state.first;//首日次数
-        this.state.ordData.quan = this.refs['treatment'].state.amount;//用量
-        this.state.ordData.noteOrd = this.refs['treatment'].state.note;//医嘱备注
+
+        this.state.DiagTreatData.dateStart = this.refs['treatment'].state.dateStart;//开始时间
+        this.state.DiagTreatData.codeFreq = this.refs['treatment'].state.ordFreqCode;//频次
+        this.state.DiagTreatData.firstNum = this.refs['treatment'].state.first;//首日次数
+        this.state.DiagTreatData.quan = this.refs['treatment'].state.amount;//用量
+        this.state.DiagTreatData.noteOrd = this.refs['treatment'].state.note;//医嘱备注
     }
 
 
@@ -354,17 +351,19 @@ class OrdSearch extends React.Component{
     saveTreatment(event) {
         this.setState({loading: true });
         console.log("保存开始");
-        console.log("保存的数据："+JSON.stringify(DiagTreatData))
+        console.log("保存的数据："+JSON.stringify( this.state.DiagTreatData))
         var cnOrdList = [];
         this.treatmentDataFactory();
+        let ordList = new Array();
+        ordList.push(this.state.DiagTreatData)
         var jsonData = {
-            cnOrdList : this.state.ordData,
+            cnOrdList : ordList,
             code : this.props.match.params.doctorCode,
             codeIp : this.props.match.params.pkPv,
             saveType : 0,
         };
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/ord/save",
+            url: window.g.nhisApi+"nhis/mobile/ord/save",
             data:{ordList:JSON.stringify(jsonData)} ,
             type: "POST",
             cache: false,

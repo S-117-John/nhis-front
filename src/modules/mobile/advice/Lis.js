@@ -58,7 +58,7 @@ class Lis extends React.Component{
     // 获取检查模板
     listEmpOrd(){
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/ord/ris/temp",
+            url: window.g.nhisApi+"nhis/mobile/ord/ris/temp",
             dataType: 'json',
             cache: false,
             success: function(data) {
@@ -72,7 +72,7 @@ class Lis extends React.Component{
 
         console.log(selectedKeys);
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/ord/temp/detail",
+            url: window.g.nhisApi+"nhis/mobile/ord/temp/detail",
             dataType: 'json',
             data:{pkOrdSet:selectedKeys[0]},
             cache: false,

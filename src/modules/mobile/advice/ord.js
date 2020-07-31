@@ -96,7 +96,7 @@ class Ord extends React.Component{
     // 获取个人模板
     listEmpOrd(){
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/doctor/personal/template?pkEmp=74f80fd350154f278c291828c7853ead",
+            url: window.g.nhisApi+"nhis/mobile/doctor/personal/template?pkEmp=74f80fd350154f278c291828c7853ead",
             dataType: 'json',
             cache: false,
             success: function(data) {
@@ -110,7 +110,7 @@ class Ord extends React.Component{
 
         console.log(selectedKeys);
         $.ajax({
-            url: global.constants.nhisApi+"nhis/mobile/ord/temp/detail",
+            url: window.g.nhisApi+"nhis/mobile/ord/temp/detail",
             dataType: 'json',
             data:{pkOrdSet:selectedKeys[0]},
             cache: false,
