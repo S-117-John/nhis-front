@@ -83,7 +83,9 @@ class Head extends React.Component {
     }
 
     goBack(){
+        console.log('点击了退出方法')
 
+        alert('退出')
     }
 
     render() {
