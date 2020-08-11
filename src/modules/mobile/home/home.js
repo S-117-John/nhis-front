@@ -113,7 +113,8 @@ class Home extends React.Component {
         //获取选中医嘱
         let newArray = this.state.tableData.filter((item,index,arr)=>{return this.state.selectedRowKeys.indexOf(item.pkCnord)>-1;});
         let data = {
-            cnOrdList:newArray
+            cnOrdList:newArray,
+            codeDept:this.props.match.params.currentDeptCode
         }
         $.ajax({
             url: this.state.api.nhisApi+"nhis/mobile/ord/sign",
@@ -265,8 +266,6 @@ class Home extends React.Component {
 
     }
     RadioGroupNow = (e) => {
-        console.log(e.target.value);
-        debugger
         var type = e.target.value
         switch (type) {
             case 'a':

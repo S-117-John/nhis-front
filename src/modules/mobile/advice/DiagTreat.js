@@ -1,7 +1,7 @@
 import React from "react";
-import {Button, Col, Input, Row, Table,Select, Radio, Tree, Switch,Divider, Space, Spin, Form, DatePicker,Modal} from "antd";
+import {Input,Select, Radio, Switch, Space, Spin, Form, DatePicker} from "antd";
 import $ from 'jquery'
-
+import moment from 'moment'
 
 const { Option } = Select;
 const {Search} = Input;
@@ -133,7 +133,7 @@ class DiagTreat extends React.Component {
                                         <Radio.Button value="0">长期</Radio.Button>
                                         <Radio.Button value="1">临时</Radio.Button>
                                     </Radio.Group>
-                                    <span>开始时间<DatePicker showTime format="YYYY-MM-DD HH:mm:ss"  onChange={(date,dateString)=>this.setState({dateStart: dateString})} /></span>
+                                    <span>开始时间<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" defaultValue={moment()}  onChange={(date,dateString)=>this.setState({dateStart: dateString})} /></span>
                                     <Switch checkedChildren="开启" unCheckedChildren="关闭"  />
                                 </Space>
                             </div>
@@ -164,7 +164,7 @@ class DiagTreat extends React.Component {
                             </Form.Item>
                             <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]}>
                                 <Select onSelect={(value=>this.state.exeDept=value)}>
-                                    {/*{this.state.ordData.exDeptList.map((item,index) => <Option  key={item.PK_DEPT} value={item.PK_DEPT} >{item.NAME_DEPT}</Option>)}*/}
+                                    {this.state.ordData.deptList.map((item,index) => <Option  key={item.pkDept} value={item.pkDept} >{item.nameDept}</Option>)}
                                 </Select>
                             </Form.Item>
                             <Form.Item

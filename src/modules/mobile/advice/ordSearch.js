@@ -61,7 +61,6 @@ class OrdSearch extends React.Component{
 
     //选择医嘱项
     choose(record) {
-        console.log(record)
         if(record.flagDurg!=null&&record.flagDurg=='1'){
             //跳转至药品明细界面
             this.state.listPkPd.push(record.key);
@@ -295,7 +294,7 @@ class OrdSearch extends React.Component{
     };
 
     listOrd(value){
-        console.log(value);
+        this.setState({loading: true });
         if(value!=""){
             $.ajax({
                 url: window.g.nhisApi+"/nhis/mobile/ord/search?spCode="+value,
@@ -304,8 +303,14 @@ class OrdSearch extends React.Component{
                 success: function(data) {
                     this.setState({
                         ordData: data.data,
+                        loading: false
                     });
 
+                }.bind(this),
+                error:function (data){
+                    this.setState({
+                        loading: false
+                    });
                 }.bind(this)
             });
         }
@@ -383,106 +388,106 @@ class OrdSearch extends React.Component{
     render(){
         return(
             <div>
+                <Spin spinning={this.state.loading}>
+                    <div >
+                        <Row>
+                            <Col span={12}>
+                                <Search  onSearch={value => this.listOrd(value)}  enterButton />
+                            </Col>
+                            <Col span={1}></Col>
+                            <Col>
+                                <Button type="primary" onClick={this.goBack}><RollbackOutlined />取消</Button>
+                            </Col>
+                        </Row>
 
-                <div >
-                    <Row>
-                        <Col span={12}>
-                            <Search  onSearch={value => this.listOrd(value)}  enterButton />
-                        </Col>
-                        <Col span={1}></Col>
-                        <Col>
-                            <Button type="primary" onClick={this.goBack}><RollbackOutlined />取消</Button>
-                        </Col>
-                    </Row>
 
+                    </div>
+                    <Divider/>
+                    <div>
+                        <Table
+                            onRow={record => {
+                                return {
+                                    onClick: event => {this.rowClick(record)}, // 点击行
+                                    onDoubleClick: event => {},
+                                    onContextMenu: event => {},
+                                    onMouseEnter: event => {}, // 鼠标移入行
+                                    onMouseLeave: event => {},
+                                };
+                            }}
+                            bordered
+                            columns={this.columns}
+                            dataSource={this.state.ordData}
+                            pagination={false}
+                            scroll={{y: 500 }}
+                        />
+                    </div>
+                    {/* 检查 */}
+                    <div>
 
-                </div>
-                <Divider/>
-                <div>
-                    <Table
-                        onRow={record => {
-                            return {
-                                onClick: event => {this.rowClick(record)}, // 点击行
-                                onDoubleClick: event => {},
-                                onContextMenu: event => {},
-                                onMouseEnter: event => {}, // 鼠标移入行
-                                onMouseLeave: event => {},
-                            };
-                        }}
-                        bordered
-                        columns={this.columns}
-                        dataSource={this.state.ordData}
-                        pagination={false}
-                        scroll={{y: 500 }}
-                    />
-                </div>
-                {/* 检查 */}
-                <div>
+                        <Modal
+                            title={this.state.modalTitle}
+                            visible={this.state.visible} onCancel={this.handleCancel}
+                            destroyOnClose={true}
+                            footer={[
 
-                    <Modal
-                        title={this.state.modalTitle}
-                        visible={this.state.visible} onCancel={this.handleCancel}
-                        destroyOnClose={true}
-                        footer={[
-
-                            <Button key="save" type="primary" loading={this.state.loading} onClick={(event,type) => this.handleOk(event,'ris')}>
-                                保存
-                            </Button>,
-                            <Button key="back" onClick={this.handleCancel}>
-                                返回
-                            </Button>,
-                        ]}
-                    >
-                    <Ris ref={'ris'} destroyModal={this.destroyModal.bind(this)} ordData={this.state.risData}/>
-                    </Modal>
-                </div>
-                {/* 检验 */}
-                <div>
-                    <Modal
-                        title={this.state.modalTitle}
-                        visible={this.state.visibleLis} onCancel={this.handleCancelLis}
-                        destroyOnClose={true}
-                        // onOk={this.handleOk}
-                        // onCancel={this.handleCancel}
-                        footer={[
-                            // <Button key="submit" type="primary" onClick={this.handleOk}>
-                            //     签署
-                            // </Button>,
-                            <Button key="save" type="primary" loading={this.state.loading} onClick={(event,type) => this.handleOkLis(event,'lis')} >
-                                保存
-                            </Button>,
-                            <Button key="back" onClick={this.handleCancelLis}>
-                                返回
-                            </Button>,
-                        ]}
-                    >
-                    <LisNew ref={'lis'} destroyModal={this.destroyModalLis.bind(this)} ordData={this.state.lisData}/>
-                    </Modal>
-                </div>
-                {/* 诊疗 */}
-                <div>
-                    <Modal
-                        title={this.state.modalTitle}
-                        visible={this.state.visibleDiagTreat} onCancel={this.handleCancelDiagTreat}
-                        destroyOnClose={true}
-                        // onOk={this.handleOk}
-                        // onCancel={this.handleCancel}
-                        footer={[
-                            // <Button key="submit" type="primary" onClick={this.handleOk}>
-                            //     签署
-                            // </Button>,
-                            <Button key="save" type="primary" onClick={this.saveTreatment.bind(this)}>
-                                保存
-                            </Button>,
-                            <Button key="back" onClick={this.handleCancelDiagTreat}>
-                                返回
-                            </Button>,
-                        ]}
-                    >
-                    <DiagTreat ref={'treatment'} destroyModal={this.destroyModalDiagTreat.bind(this)} ordData={this.state.DiagTreatData}/>
-                    </Modal>
-                </div>
-
+                                <Button key="save" type="primary" loading={this.state.loading} onClick={(event,type) => this.handleOk(event,'ris')}>
+                                    保存
+                                </Button>,
+                                <Button key="back" onClick={this.handleCancel}>
+                                    返回
+                                </Button>,
+                            ]}
+                        >
+                            <Ris ref={'ris'} destroyModal={this.destroyModal.bind(this)} ordData={this.state.risData}/>
+                        </Modal>
+                    </div>
+                    {/* 检验 */}
+                    <div>
+                        <Modal
+                            title={this.state.modalTitle}
+                            visible={this.state.visibleLis} onCancel={this.handleCancelLis}
+                            destroyOnClose={true}
+                            // onOk={this.handleOk}
+                            // onCancel={this.handleCancel}
+                            footer={[
+                                // <Button key="submit" type="primary" onClick={this.handleOk}>
+                                //     签署
+                                // </Button>,
+                                <Button key="save" type="primary" loading={this.state.loading} onClick={(event,type) => this.handleOkLis(event,'lis')} >
+                                    保存
+                                </Button>,
+                                <Button key="back" onClick={this.handleCancelLis}>
+                                    返回
+                                </Button>,
+                            ]}
+                        >
+                            <LisNew ref={'lis'} destroyModal={this.destroyModalLis.bind(this)} ordData={this.state.lisData}/>
+                        </Modal>
+                    </div>
+                    {/* 诊疗 */}
+                    <div>
+                        <Modal
+                            title={this.state.modalTitle}
+                            visible={this.state.visibleDiagTreat} onCancel={this.handleCancelDiagTreat}
+                            destroyOnClose={true}
+                            // onOk={this.handleOk}
+                            // onCancel={this.handleCancel}
+                            footer={[
+                                // <Button key="submit" type="primary" onClick={this.handleOk}>
+                                //     签署
+                                // </Button>,
+                                <Button key="save" type="primary" onClick={this.saveTreatment.bind(this)}>
+                                    保存
+                                </Button>,
+                                <Button key="back" onClick={this.handleCancelDiagTreat}>
+                                    返回
+                                </Button>,
+                            ]}
+                        >
+                            <DiagTreat ref={'treatment'} destroyModal={this.destroyModalDiagTreat.bind(this)} ordData={this.state.DiagTreatData}/>
+                        </Modal>
+                    </div>
+                </Spin>
             </div>
         );
     }
