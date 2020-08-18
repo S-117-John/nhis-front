@@ -116,6 +116,11 @@ class DiagTreat extends React.Component {
         this.props.destroyModal();
     }
 
+    defaultDept(){
+        if(this.state.ordData.deptList.length>0){
+            return this.state.ordData.deptList[0].pkDept
+        }
+    }
 
 
     render() {
@@ -163,7 +168,7 @@ class DiagTreat extends React.Component {
                                 <Input addonAfter={this.state.ordData.unitPackName} onChange={event => this.state.amount = event.target.value}/>
                             </Form.Item>
                             <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]}>
-                                <Select onSelect={(value=>this.state.exeDept=value)}>
+                                <Select onSelect={(value=>this.state.exeDept=value)} defaultValue={this.defaultDept()}>
                                     {this.state.ordData.deptList.map((item,index) => <Option  key={item.pkDept} value={item.pkDept} >{item.nameDept}</Option>)}
                                 </Select>
                             </Form.Item>
