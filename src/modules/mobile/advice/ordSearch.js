@@ -366,8 +366,6 @@ class OrdSearch extends React.Component{
     //保存诊疗数据
     saveTreatment(event) {
         this.setState({loading: true });
-        console.log("保存开始");
-        console.log("保存的数据："+JSON.stringify( this.state.DiagTreatData))
         var cnOrdList = [];
         this.treatmentDataFactory();
         let ordList = new Array();
@@ -384,13 +382,11 @@ class OrdSearch extends React.Component{
             type: "POST",
             cache: false,
             success: function(data) {
-                console.log("保存成功");
-                this.setState({visibleDiagTreat: false });
+                this.setState({visibleDiagTreat: false, loading:false});
 
             }.bind(this),
             error:function (data) {
-                console.log("保存失败");
-                this.setState({visibleDiagTreat: false });
+                this.setState({visibleDiagTreat: false,loading:false });
             }.bind(this)
         });
     }
