@@ -44,6 +44,7 @@ class OrdSearch extends React.Component{
         lisData:null,
         loading: false,
         DiagTreatData:null,
+        exeDeptList:null,//执行科室
     };
 
     componentDidMount() {
@@ -167,15 +168,25 @@ class OrdSearch extends React.Component{
         //     content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
         // });
     };
+
+    //弹出诊疗项目页面
     showModalDiagTreat = (title) => {
-        this.setState({
-            visibleDiagTreat: true,
-            modalTitle: title,
+        //获取当前科室业务线对应的执行科室
+        $.ajax({
+            url: window.g.nhisApi+"nhis/mobile/ord/exeDept?deptCode="+this.props.currentDeptCode,
+            dataType: 'json',
+            cache: false,
+            success: function(data) {
+
+                this.setState({
+                    exeDeptList: data,
+                    visibleDiagTreat: true,
+                    modalTitle: title,});
+
+
+            }.bind(this)
         });
-        // const modal = Modal.info({
-        //     title: title,
-        //     content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
-        // });
+
     };
     //检查确定保存方法
     handleOk = (e,type) => {
@@ -470,12 +481,7 @@ class OrdSearch extends React.Component{
                             title={this.state.modalTitle}
                             visible={this.state.visibleDiagTreat} onCancel={this.handleCancelDiagTreat}
                             destroyOnClose={true}
-                            // onOk={this.handleOk}
-                            // onCancel={this.handleCancel}
                             footer={[
-                                // <Button key="submit" type="primary" onClick={this.handleOk}>
-                                //     签署
-                                // </Button>,
                                 <Button key="save" type="primary" onClick={this.saveTreatment.bind(this)}>
                                     保存
                                 </Button>,
@@ -484,7 +490,7 @@ class OrdSearch extends React.Component{
                                 </Button>,
                             ]}
                         >
-                            <DiagTreat ref={'treatment'} destroyModal={this.destroyModalDiagTreat.bind(this)} ordData={this.state.DiagTreatData}/>
+                            <DiagTreat ref={'treatment'} destroyModal={this.destroyModalDiagTreat.bind(this)} ordData={this.state.DiagTreatData} exeDeptList={this.state.exeDeptList}/>
                         </Modal>
                     </div>
                 </Spin>

@@ -61,6 +61,8 @@ class DiagTreat extends React.Component {
         exeDept:'',//执行科室
         note:'',//备注
         dateStart:null,//开始时间
+        currentDeptCode:this.props.currentDeptCode,//当前科室编码
+        exeDeptList:this.props.exeDeptList,//执行科室列表
     }
 
     componentDidMount() {
@@ -98,6 +100,8 @@ class DiagTreat extends React.Component {
     };
 
 
+
+
     toAdviceSearch(value) {
         this.props.history.push('/medicalAdviceSearch/' + this.props.pkPv + "/" + this.props.doctorCode + "/" + value)
     }
@@ -117,8 +121,8 @@ class DiagTreat extends React.Component {
     }
 
     defaultDept(){
-        if(this.state.ordData.deptList.length>0){
-            return this.state.ordData.deptList[0].pkDept
+        if(this.state.exeDeptList.length>0){
+            return this.state.exeDeptList[0].pkDept
         }
     }
 
@@ -169,7 +173,7 @@ class DiagTreat extends React.Component {
                             </Form.Item>
                             <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]}>
                                 <Select onSelect={(value=>this.state.exeDept=value)} defaultValue={this.defaultDept()}>
-                                    {this.state.ordData.deptList.map((item,index) => <Option  key={item.pkDept} value={item.pkDept} >{item.nameDept}</Option>)}
+                                    {this.state.exeDeptList.map((item,index) => <Option  key={item.pkDept} value={item.pkDept} >{item.nameDept}</Option>)}
                                 </Select>
                             </Form.Item>
                             <Form.Item
