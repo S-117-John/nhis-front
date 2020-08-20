@@ -1,5 +1,5 @@
 import React from 'react';
-import Spin, {
+import {
     Button,
     Col,
     Row,
@@ -11,7 +11,8 @@ import Spin, {
     Divider,
     Modal,
     DatePicker,
-    message
+    message,
+    Spin
 } from "antd";
 import $ from 'jquery'
 import Head from "../common/head";
