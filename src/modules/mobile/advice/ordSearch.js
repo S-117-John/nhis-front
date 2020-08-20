@@ -172,6 +172,7 @@ class OrdSearch extends React.Component{
     //弹出诊疗项目页面
     showModalDiagTreat = (title) => {
         //获取当前科室业务线对应的执行科室
+        this.setState({loading: true });
         $.ajax({
             url: window.g.nhisApi+"nhis/mobile/ord/exeDept?deptCode="+this.props.currentDeptCode,
             dataType: 'json',
@@ -181,7 +182,8 @@ class OrdSearch extends React.Component{
                 this.setState({
                     exeDeptList: data,
                     visibleDiagTreat: true,
-                    modalTitle: title,});
+                    modalTitle: title,
+                    loading: false});
 
 
             }.bind(this)
