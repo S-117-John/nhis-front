@@ -1,5 +1,5 @@
 import React from 'react';
-import {
+import Spin, {
     Button,
     Col,
     Row,
@@ -46,7 +46,8 @@ class Home extends React.Component {
         selected: null,//选中状态
         stopTime:null,//停止时间
         isDisabled:false,//按钮不可用
-        api:window.g
+        api:window.g,
+        loading:false ,//加载
 
     };
 
@@ -193,9 +194,15 @@ class Home extends React.Component {
         });
     };
 
+    //查询患者医嘱信息
     listPatientOrder() {
+        this.setState({
+            loading:true
+        })
         this.serverRequest = $.get(this.state.api.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.hosId, function (result) {
-
+            this.setState({
+                loading:false
+            })
             if (result.code == 400) {
                 this.setState({
                     isDisabled:true
@@ -566,6 +573,9 @@ class Home extends React.Component {
 
         return (
             <div>
+                <Spin spinning={this.state.loading}>
+
+
                 <div style={{margin: 20}}>
 
                     <Head pkPv={this.props.match.params.hosId} doctorCode={this.props.match.params.doctorCode} setBtnDisable={this.setBtnDisable}/>
@@ -734,6 +744,8 @@ class Home extends React.Component {
                        onOk={this.handleOkDelOrder} onCancel={this.handleCancelDelOrder}>
                     <p>确认删除所选医嘱吗？</p>
                 </Modal>
+
+                </Spin>
             </div>
         );
     }

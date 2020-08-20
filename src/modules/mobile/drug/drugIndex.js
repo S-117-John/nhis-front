@@ -184,6 +184,7 @@ class DrugIndex extends React.Component{
             item.euPvtype = '3';//就诊类型
             item.descOrd = this.state.descOrd;
             item.pkOrd = item.pkPd;
+            item.dosage = this.refs[index].state.dosage;//用量
             console.log('结果：'+JSON.stringify(item))
         })
     }
@@ -235,7 +236,6 @@ class DrugIndex extends React.Component{
         codeIp : this.props.match.params.pkPv,
         saveType : 0,
     };
-    debugger;
     $.ajax({
         url: window.g.nhisApi+"nhis/mobile/ord/save",
         data:{ordList:JSON.stringify(jsonData)} ,
