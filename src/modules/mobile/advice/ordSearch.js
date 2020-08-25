@@ -357,6 +357,7 @@ class OrdSearch extends React.Component{
     //整合诊疗数据
     treatmentDataFactory(){
 
+        console.log("开始时间："+this.refs['treatment'].state.dateStart)
         this.state.DiagTreatData.dateStart = this.refs['treatment'].state.dateStart;//开始时间
         this.state.DiagTreatData.codeFreq = this.refs['treatment'].state.ordFreqCode;//频次
         this.state.DiagTreatData.firstNum = this.refs['treatment'].state.first;//首日次数
@@ -372,6 +373,7 @@ class OrdSearch extends React.Component{
         this.treatmentDataFactory();
         let ordList = new Array();
         ordList.push(this.state.DiagTreatData)
+        console.log(JSON.stringify(this.state.DiagTreatData))
         var jsonData = {
             cnOrdList : ordList,
             code : this.props.match.params.doctorCode,
@@ -473,25 +475,25 @@ class OrdSearch extends React.Component{
                             <LisNew ref={'lis'} destroyModal={this.destroyModalLis.bind(this)} ordData={this.state.lisData}/>
                         </Modal>
                     </div>
-                    {/* 诊疗 */}
-                    <div>
-                        <Modal
-                            title={this.state.modalTitle}
-                            visible={this.state.visibleDiagTreat} onCancel={this.handleCancelDiagTreat}
-                            destroyOnClose={true}
-                            footer={[
-                                <Button key="save" type="primary" onClick={this.saveTreatment.bind(this)}>
-                                    保存
-                                </Button>,
-                                <Button key="back" onClick={this.handleCancelDiagTreat}>
-                                    返回
-                                </Button>,
-                            ]}
-                        >
-                            <DiagTreat ref={'treatment'} destroyModal={this.destroyModalDiagTreat.bind(this)} ordData={this.state.DiagTreatData} exeDeptList={this.state.exeDeptList}/>
-                        </Modal>
-                    </div>
+
+
                 </Spin>
+                {/*诊疗项目*/}
+                <Modal
+                    title={this.state.modalTitle}
+                    visible={this.state.visibleDiagTreat} onCancel={this.handleCancelDiagTreat}
+                    destroyOnClose={true}
+                    footer={[
+                        <Button key="save" type="primary" onClick={this.saveTreatment.bind(this)}>
+                            保存
+                        </Button>,
+                        <Button key="back" onClick={this.handleCancelDiagTreat}>
+                            返回
+                        </Button>,
+                    ]}
+                >
+                    <DiagTreat ref={'treatment'} destroyModal={this.destroyModalDiagTreat.bind(this)} ordData={this.state.DiagTreatData} exeDeptList={this.state.exeDeptList}/>
+                </Modal>
             </div>
         );
     }

@@ -126,6 +126,12 @@ class Home extends React.Component {
                 message.info('执行成功');
                 this.listPatientOrder();
 
+            }.bind(this),
+            error: function (data){
+                notification.open({
+                    message: '提示',
+                    description: "签署失败",
+                });
             }.bind(this)
         });
     }

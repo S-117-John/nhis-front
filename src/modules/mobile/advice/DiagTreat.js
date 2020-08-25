@@ -60,7 +60,7 @@ class DiagTreat extends React.Component {
         amount:'',//用量
         exeDept:'',//执行科室
         note:'',//备注
-        dateStart:null,//开始时间
+        dateStart:moment(),//开始时间
         currentDeptCode:this.props.currentDeptCode,//当前科室编码
         exeDeptList:this.props.exeDeptList,//执行科室列表
     }
@@ -126,6 +126,10 @@ class DiagTreat extends React.Component {
         }
     }
 
+    defaultStartTime=()=>{
+        this.setState({dateStart: moment().format('YYYY-MM-DD HH:mm:ss')})
+        return
+    }
 
     render() {
         return (
@@ -142,7 +146,7 @@ class DiagTreat extends React.Component {
                                         <Radio.Button value="0">长期</Radio.Button>
                                         <Radio.Button value="1">临时</Radio.Button>
                                     </Radio.Group>
-                                    <span>开始时间<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" defaultValue={moment()}  onChange={(date,dateString)=>this.setState({dateStart: dateString})} /></span>
+                                    <span>开始时间<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" defaultValue={this.state.dateStart}  onChange={(date,dateString)=>this.setState({dateStart: dateString})} /></span>
                                     <Switch checkedChildren="开启" unCheckedChildren="关闭"  />
                                 </Space>
                             </div>
