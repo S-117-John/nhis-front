@@ -235,6 +235,7 @@ class DrugIndex extends React.Component{
         code : this.props.match.params.doctorCode,
         codeIp : this.props.match.params.pkPv,
         saveType : 0,
+        codeDept: this.props.match.params.currentDeptCode
     };
     $.ajax({
         url: window.g.nhisApi+"nhis/mobile/ord/save",
