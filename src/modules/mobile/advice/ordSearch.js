@@ -363,6 +363,7 @@ class OrdSearch extends React.Component{
         this.state.DiagTreatData.codeFreq = this.refs['treatment'].state.ordFreqCode;//频次
         this.state.DiagTreatData.firstNum = this.refs['treatment'].state.first;//首日次数
         this.state.DiagTreatData.quan = this.refs['treatment'].state.amount;//用量
+        this.state.DiagTreatData.dosage = this.refs['treatment'].state.amount;//用量
         this.state.DiagTreatData.noteOrd = this.refs['treatment'].state.note;//医嘱备注
     }
 
