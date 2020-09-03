@@ -365,6 +365,7 @@ class OrdSearch extends React.Component{
         this.state.DiagTreatData.quan = this.refs['treatment'].state.amount;//用量
         this.state.DiagTreatData.dosage = this.refs['treatment'].state.amount;//用量
         this.state.DiagTreatData.noteOrd = this.refs['treatment'].state.note;//医嘱备注
+        this.state.DiagTreatData.euAlways = this.refs['treatment'].state.euAlways;//长期临时
     }
 
 

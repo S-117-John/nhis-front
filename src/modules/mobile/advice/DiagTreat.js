@@ -36,7 +36,9 @@ const dateTimeonfig = {
 //长期/临时切换
 function radioGroup(e) {
     console.log(e.target.value);
-    this.state.euAlways = e.target.value;
+    this.setState({
+        euAlways:e.target.value
+    })
 }
 
 class DiagTreat extends React.Component {
@@ -63,6 +65,7 @@ class DiagTreat extends React.Component {
         dateStart:moment(),//开始时间
         currentDeptCode:this.props.currentDeptCode,//当前科室编码
         exeDeptList:this.props.exeDeptList,//执行科室列表
+        euAlways: 0,
     }
 
     componentDidMount() {
