@@ -174,7 +174,8 @@ class OrdSearch extends React.Component{
         //获取当前科室业务线对应的执行科室
         this.setState({loading: true });
         $.ajax({
-            url: window.g.nhisApi+"nhis/mobile/ord/exeDept?deptCode="+this.props.currentDeptCode,
+            url: window.g.nhisApi+"nhis/mobile/bd/ou/dept",
+            type: "GET",
             dataType: 'json',
             cache: false,
             success: function(data) {
