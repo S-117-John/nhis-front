@@ -384,7 +384,7 @@ class OrdSearch extends React.Component{
             saveType : 0,
         };
         $.ajax({
-            url: window.g.nhisApi+"nhis/mobile/ord/save",
+            url: window.g.nhisApi+"nhis/mobile/ord/saveTreatment",
             data:{ordList:JSON.stringify(jsonData)} ,
             type: "POST",
             cache: false,
