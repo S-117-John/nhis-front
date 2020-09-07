@@ -355,10 +355,13 @@ class OrdSearch extends React.Component{
     }
 
 
-    //整合诊疗数据
-    treatmentDataFactory(){
 
-        console.log("开始时间："+this.refs['treatment'].state.dateStart)
+
+
+    //保存诊疗数据
+    saveTreatment(event) {
+        this.setState({loading: true });
+        var cnOrdList = [];
         this.state.DiagTreatData.dateStart = this.refs['treatment'].state.dateStart;//开始时间
         this.state.DiagTreatData.codeFreq = this.refs['treatment'].state.ordFreqCode;//频次
         this.state.DiagTreatData.firstNum = this.refs['treatment'].state.first;//首日次数
@@ -366,14 +369,7 @@ class OrdSearch extends React.Component{
         this.state.DiagTreatData.dosage = this.refs['treatment'].state.amount;//用量
         this.state.DiagTreatData.noteOrd = this.refs['treatment'].state.note;//医嘱备注
         this.state.DiagTreatData.euAlways = this.refs['treatment'].state.euAlways;//长期临时
-    }
-
-
-    //保存诊疗数据
-    saveTreatment(event) {
-        this.setState({loading: true });
-        var cnOrdList = [];
-        this.treatmentDataFactory();
+        this.state.DiagTreatData.pkDeptExec = this.refs['treatment'].state.exeDept;//执行科室
         let ordList = new Array();
         ordList.push(this.state.DiagTreatData)
         console.log(JSON.stringify(this.state.DiagTreatData))

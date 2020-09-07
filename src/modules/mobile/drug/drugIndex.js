@@ -227,7 +227,6 @@ class DrugIndex extends React.Component{
 //保存
  save(event) {
     this.setState({loading: true });
-    console.log("保存开始");
     var cnOrdList = [];
     this.resultDataFactory();
     var jsonData = {
@@ -238,7 +237,7 @@ class DrugIndex extends React.Component{
         codeDept: this.props.match.params.currentDeptCode
     };
     $.ajax({
-        url: window.g.nhisApi+"nhis/mobile/ord/save",
+        url: window.g.nhisApi+"nhis/mobile/ord/saveDrug",
         data:{ordList:JSON.stringify(jsonData)} ,
         type: "POST",
         cache: false,

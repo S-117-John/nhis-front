@@ -125,6 +125,7 @@ class DiagTreat extends React.Component {
 
     defaultDept(){
         if(this.state.exeDeptList.length>0){
+            this.state.exeDept=this.state.exeDeptList[0].pkDept
             return this.state.exeDeptList[0].pkDept
         }
     }
