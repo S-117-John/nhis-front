@@ -361,32 +361,25 @@ class OrdSearch extends React.Component{
     //保存诊疗数据
     saveTreatment(event) {
         this.setState({loading: true });
-        var cnOrdList = [];
-        this.state.DiagTreatData.dateStart = this.refs['treatment'].state.dateStart;//开始时间
-        this.state.DiagTreatData.codeFreq = this.refs['treatment'].state.ordFreqCode;//频次
-        this.state.DiagTreatData.firstNum = this.refs['treatment'].state.first;//首日次数
-        this.state.DiagTreatData.quan = this.refs['treatment'].state.amount;//用量
-        this.state.DiagTreatData.dosage = this.refs['treatment'].state.amount;//用量
-        this.state.DiagTreatData.noteOrd = this.refs['treatment'].state.note;//医嘱备注
-        this.state.DiagTreatData.euAlways = this.refs['treatment'].state.euAlways;//长期临时
-        this.state.DiagTreatData.pkDeptExec = this.refs['treatment'].state.exeDept;//执行科室
-        let ordList = new Array();
-        ordList.push(this.state.DiagTreatData)
-        console.log(JSON.stringify(this.state.DiagTreatData))
-        var jsonData = {
-            cnOrdList : ordList,
-            code : this.props.match.params.doctorCode,
-            codeIp : this.props.match.params.pkPv,
-            saveType : 0,
-        };
         $.ajax({
             url: window.g.nhisApi+"nhis/mobile/ord/saveTreatment",
-            data:{ordList:JSON.stringify(jsonData)} ,
+            data:{
+                doctorCode : this.props.match.params.doctorCode,
+                codeIp : this.props.match.params.pkPv,
+                pkOrd: this.refs['treatment'].state.ordData.pkOrd,
+                codeDept:this.props.currentDeptCode,
+                euAlways:this.refs['treatment'].state.euAlways,
+                codeFreq:this.refs['treatment'].state.ordFreqCode,
+                quan:this.refs['treatment'].state.amount,
+                pkDeptExec:this.refs['treatment'].state.exeDept,
+                dateStart:this.refs['treatment'].state.dateStart,
+                firstNum:this.refs['treatment'].state.first,//首日次数
+                noteOrd:this.refs['treatment'].state.note//医嘱备注
+            },
             type: "POST",
             cache: false,
             success: function(data) {
                 this.setState({visibleDiagTreat: false, loading:false});
-
             }.bind(this),
             error:function (data) {
                 this.setState({visibleDiagTreat: false,loading:false });
