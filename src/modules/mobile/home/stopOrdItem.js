@@ -14,6 +14,8 @@ class StopOrdItem extends React.Component{
         };
     }
 
+
+
     render() {
         return(
             <div >
@@ -29,7 +31,8 @@ class StopOrdItem extends React.Component{
                                 <span>{this.state.ordData.nameOrd}</span>
                                 <span style={{width:100,marginLeft:30}}>用量：{this.state.ordData.quan}</span>
                                 <span style={{width:100,marginLeft:30}}>末次</span>
-                                <InputNumber addonBefore="末次:"  min={0} max={99999} defaultValue={this.state.ordData.quan} />
+                                {/*onChange={event => this.state.ordData.lastNum = event.target.value*/}
+                                <InputNumber name={this.props.index} addonBefore="末次:"  min={0} max={99999} defaultValue={this.state.ordData.quan} onChange={event => this.state.ordData.lastNum = event}/>
                                
                             </div>
                         </div>

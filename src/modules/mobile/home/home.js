@@ -79,13 +79,22 @@ class Home extends React.Component {
 
     //确定停止医嘱
     handleOkStopOrder = e => {
+
+        const ordStopList = [];
         this.state.ordStopDataList.map((value, index) => {
             value.dateStop = this.state.stopTime;
+            var ordData = this.refs['stop'+index].state.ordData;
+            console.log(ordData)
+            ordData.dateStop = this.state.stopTime;
+            // ordData.lastNum=this.state.ordData.lastNum
+            ordStopList.push(ordData)
         });
+
+
         $.ajax({
             url: this.state.api.nhisApi+"nhis/mobile/ord/stop",
             type:"PUT",
-            data: {param:JSON.stringify(this.state.ordStopDataList)},
+            data: {param:JSON.stringify(ordStopList)},
             success: function(data) {
                 message.info('执行成功');
                 this.listPatientOrder();
@@ -744,7 +753,7 @@ class Home extends React.Component {
                     </Descriptions>
                     <Divider/>
                     <div style={{marginTop: 15}}>
-                        {this.state.ordStopDataList.map((item, index) => <StopOrdItem ordData={item} key={index}/>)}
+                        {this.state.ordStopDataList.map((item, index) => <StopOrdItem ref={"stop"+index} ordData={item} key={index} index={index}/>)}
                     </div>
                 </Modal>
                 <Modal title="删除" visible={this.state.visibleDel}
