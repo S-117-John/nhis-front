@@ -137,7 +137,7 @@ class DrugIndex extends React.Component{
                     ordList.push(item);
                 })
                 ordList.push(data.data);
-                console.log("新数组"+JSON.stringify(ordList));
+
                 this.setState({
                     ordDataList: ordList
                 });
@@ -165,13 +165,6 @@ class DrugIndex extends React.Component{
     //数据整合
     resultDataFactory(){
         this.state.ordDataList.map((item,index) => {
-            console.log( 'index:'+index)
-            console.log( 'item:'+JSON.stringify(item))
-            console.log("备注："+this.refs[index].state.note)
-            console.log("用量："+this.refs[index].state.dosage)
-            console.log("加急："+this.refs[index].state.emergency)
-            console.log("自备："+this.refs[index].state.own)
-            console.log("皮试："+this.refs[index].state.skin)
             item.codeFreq = this.state.ordFreqCode;//频次
             item.codeSupply = this.state.ordSupplyCode;//医嘱用法编码
             item.firstNum = this.state.firstTime;//首日次数
@@ -185,29 +178,33 @@ class DrugIndex extends React.Component{
             item.descOrd = this.state.descOrd;
             item.pkOrd = item.pkPd;
             item.dosage = this.refs[index].state.dosage;//用量
-            console.log('结果：'+JSON.stringify(item))
         })
     }
 
 
-    //签署
+    //保存并签署
     sign(e){
-        console.log(JSON.stringify(this.state.ordDataList))
         this.resultDataFactory();
+
         var jsonData = {
-            cnOrdList : this.state.ordDataList,
-            code : this.props.match.params.doctorCode,
-            codeIp : this.props.match.params.pkPv,
-            saveType : 1,
+                doctorCode:this.props.match.params.doctorCode,
+                codeIp:this.props.match.params.pkPv,
+                codeDept:this.props.match.params.currentDeptCode,
+                cnOrderList : this.state.ordDataList,
         };
         $.ajax({
-            url: window.g.nhisApi+"nhis/mobile/ord/save",
-            data:{ordList:JSON.stringify(jsonData)} ,
+            contentType: "application/json;charset=UTF-8",//指定消息请求类型
+            url: window.g.nhisApi+"nhis/mobile/ord/saveAndSignDrug",
+            data:JSON.stringify(jsonData),
             type: "POST",
             cache: false,
             success: function(data) {
-                console.log("保存成功");
                 this.setState({loading: false });
+                if(data.code==200){
+                    //跳转至首页
+                    this.props.history.push('/home/'+this.props.match.params.pkPv+"/"+this.props.match.params.doctorCode+"/"+this.props.match.params.currentDeptCode);
+                }
+
             }.bind(this),
             error:function (data) {
                 this.setState({loading: false });
