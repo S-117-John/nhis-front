@@ -17,29 +17,9 @@ const ordDataList=[];
 //获取药品明细
 
 
-//频次
-function listBdTermFreq() {
-    $.ajax({
-        url: window.g.nhisApi+"nhis/mobile/bd/term/freq",
-        dataType: 'json',
-        cache: false,
-        success: function(data) {
-            this.setState({bdTermFreq: data.data});
-        }.bind(this)
-    });
-}
 
-// 医嘱用法
-function listSupply() {
-    $.ajax({
-        url: window.g.nhisApi+"nhis/mobile/bd/supply",
-        dataType: 'json',
-        cache: false,
-        success: function(data) {
-            this.setState({listBdSupply: data.data});
-        }.bind(this)
-    });
-}
+
+
 
 
 
@@ -53,10 +33,9 @@ class DrugIndex extends React.Component{
 
     constructor(props) {
         super(props);
-        listBdTermFreq = listBdTermFreq.bind(this);
-        listSupply = listSupply.bind(this);
         radioGroup = radioGroup.bind(this);
-
+        this.listBdTermFreq();
+        this.listSupply();
     }
 
 
@@ -77,14 +56,38 @@ class DrugIndex extends React.Component{
     componentDidMount() {
         console.log("pkPd:"+this.props.match.params.pkPd);
 
-        listBdTermFreq();
-        listSupply();
+
         this.getBdPd(this.props.match.params.pkPd);
     }
 
     componentWillUnmount() {
         this.setState = ()=>false;
 
+    }
+
+    //频次
+    listBdTermFreq() {
+        $.ajax({
+            url: window.g.nhisApi+"nhis/mobile/bd/term/freq",
+            dataType: 'json',
+            cache: false,
+            success: function(data) {
+                console.log("获取到频次数据"+JSON.stringify(data))
+                this.setState({bdTermFreq: data.data});
+            }.bind(this)
+        });
+    }
+
+    // 医嘱用法
+    listSupply() {
+        $.ajax({
+            url: window.g.nhisApi+"nhis/mobile/bd/supply",
+            dataType: 'json',
+            cache: false,
+            success: function(data) {
+                this.setState({listBdSupply: data.data});
+            }.bind(this)
+        });
     }
 
     //删除子组件
