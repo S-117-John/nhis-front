@@ -233,6 +233,11 @@ class DrugIndex extends React.Component{
          codeIp:this.props.match.params.pkPv,
          codeDept:this.props.match.params.currentDeptCode,
          cnOrderList : this.state.ordDataList,
+         //开始时间
+         //长期临时
+         //频次代码
+         //用法代码
+         //首次
      };
     $.ajax({
         contentType: "application/json;charset=UTF-8",//指定消息请求类型
