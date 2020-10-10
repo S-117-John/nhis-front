@@ -49,7 +49,7 @@ class Ris extends React.Component {
         treeData: [],
         loading: false,
         startTime:'',
-        exeDept:'',
+        exeDept:"",
         body:'',//检查部位
         purpose:'',//检查目的
         description:'',//病情描述
@@ -77,7 +77,6 @@ class Ris extends React.Component {
         })
     }
     destroyAll() {
-        console.log(23123213213);
         this.props.destroyModal();
     } 
     render() {
@@ -95,13 +94,13 @@ class Ris extends React.Component {
                             </Form.Item>
 
                             <div style={{textAlign:'center'}}>
-                                <h1>{this.state.ordData.dataList[0].name}</h1>
-                                <span>类型：{this.state.ordData.dataList[0].nameType} 单价:{this.state.ordData.dataList[0].pricestr} 申请单号：{this.state.ordData.codeApple[0]}</span>
+                                <h1>{this.state.ordData.nameOrd}</h1>
+                                <span>类型：{this.state.ordData.nameType} 单价: 申请单号：{this.state.ordData.codeApply}</span>
                             </div>
 
                             <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]} name="exDept">
-                                <Select style={{ width: 290 }} defaultValue={this.state.ordData.exDeptList[0].pkDept} onSelect={value=>this.state.exeDept=value} >
-                                    {this.state.ordData.exDeptList.map((item,index) => <Option  key={item.pkDept} value={item.pkDept} >{item.nameDept}</Option>)}
+                                <Select style={{ width: 290 }}  onSelect={value=>this.state.exeDept=value} >
+                                    {this.state.ordData.deptList.map((item,index) => <Option  key={item.pkDept} value={item.pkDept} >{item.nameDept}</Option>)}
                                 </Select>
                             </Form.Item>
                             <Form.Item
@@ -109,7 +108,7 @@ class Ris extends React.Component {
                                 name="body"
                                 rules={[{required: false, message: '请输入检查部位!'}]}
                             >
-                                <Input defaultValue={this.state.ordData.dataList[0].descBody} onChange={event => this.state.body = event.target.value}/>
+                                <Input  onChange={event => this.state.body = event.target.value}/>
                             </Form.Item>
 
                             <Form.Item
@@ -130,7 +129,7 @@ class Ris extends React.Component {
 
                             <Form.Item
                                 label="注意事项"
-                                name="notice" defaultValue={this.state.ordData.dataList[0].descAtt}
+                                name="notice"
                                 rules={[{required: false, message: '请输入注意事项!'}]}
                             >
                                 <Input onChange={event => this.state.notice = event.target.value}/>

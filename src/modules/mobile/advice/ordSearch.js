@@ -1,7 +1,7 @@
 import React from "react";
 import $ from 'jquery'
 import {withRouter} from 'react-router-dom';
-import {Button, Col, Divider, Input, Modal, Spin,Popconfirm, Row, Table} from "antd";
+import {Button, Col, Divider, Input, Modal, Spin, Popconfirm, Row, Table, message} from "antd";
 import { RollbackOutlined} from '@ant-design/icons';
 import Ris from "./Ris";
 import LisNew from "./LisNew";
@@ -52,7 +52,6 @@ class OrdSearch extends React.Component{
     }
 
     componentWillUnmount() {
-        // this.serverRequest.abort();
         this.setState = ()=>false;
     }
 
@@ -68,7 +67,8 @@ class OrdSearch extends React.Component{
             this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.props.currentDeptCode+"/"+this.state.listPkPd);
         }
         else if(record.codeOrdType!=null&&record.codeOrdType=='02'){
-            $.get(window.g.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
+
+            $.get(window.g.nhisApi + "nhis/mobile/ord/ris/info?pkOrd=" + record.key, function (result) {
                 console.log(result);
                 if (result.code == 200) {
                     this.setState({
@@ -153,10 +153,6 @@ class OrdSearch extends React.Component{
             visible: true,
             modalTitle: title,
         });
-        //  const modal = Modal.info({
-        //      title: title,
-        //      content: <Ris destroyModal={this.destroyModal.bind(this)}/>,
-        //  });
     };
     showModalLis = (title) => {
         this.setState({
@@ -193,51 +189,43 @@ class OrdSearch extends React.Component{
     };
     //检查确定保存方法
     handleOk = (e,type) => {
-        console.log(e);
         this.setState({loading: true });
-        if('ris'==type){
-            console.log("检查："+JSON.stringify(this.refs['ris'].state.ordData))
-            var dataOld=this.refs['ris'].state.ordData.dataList[0];
-            var dataNew=this.refs['ris'].state;
-            var exeDept=dataNew.exeDept;
-            if(!exeDept){
-                exeDept=this.refs['ris'].state.ordData.exDeptList[0].pkDept;
-            }
-            var saveData={pkOrd:dataOld.pkOrd,codeOrd:dataOld.code,
-                nameOrd:dataOld.name,purpose:dataNew.purpose,
-                dateStart:dataNew.startTime,codeApply:this.refs['ris'].state.ordData.codeApple[0],pkPv:null,pkPi:null,
-                pkDeptExec:exeDept,codeOrdType:dataOld.codeOrdtype,
-                flagBl:dataOld.flagCg,quan:1,flagEmer:"0",
-                priceCg:dataOld.pricestr,euOrdtype:dataOld.euOrdtype,
-                risNotice:dataNew.notice,note:dataNew.note,descBody:dataNew.body
-                }
-            var saveDataList=new Array();
-            saveDataList[0]=saveData;
-            var jsonData = {
-                risApplyList : saveDataList,
-                code : this.props.match.params.doctorCode,
+        $.ajax({
+            url: window.g.nhisApi+"nhis/mobile/ord/saveRisApply",
+            dataType: 'JSON',
+            data:{
+                doctorCode : this.props.match.params.doctorCode,
                 codeIp : this.props.match.params.pkPv,
-                codeDept:this.props.currentDeptCode
-            };
-            $.ajax({
-                url: window.g.nhisApi+"nhis/mobile/ord/saveRisApplyList",
-                //dataType: 'json',
-                data:{param:JSON.stringify(jsonData)} ,
-                type: "POST",
-                cache: false,
-                success: function(data) {
-                    console.log("保存成功");
-                    this.setState({
-                        visible: false,
-                    });
-                    this.setState({loading: false });
-                }.bind(this),
-                error:function (data) {
-                    this.setState({loading: false });
-                }.bind(this)
-            });
-        }
-        // Modal.destroyAll();
+                codeDept:this.props.currentDeptCode,
+                pkOrd:this.refs['ris'].state.ordData.pkOrd,
+                pkDeptExec:this.refs['ris'].state.ordData.exeDept,
+                dateStart:this.refs['ris'].state.startTime,
+                descBody:this.refs['ris'].state.body,
+                purpose:this.refs['ris'].state.purpose,
+                noteDise:this.refs['ris'].state.description,
+                note:this.refs['ris'].state.note,
+            } ,
+            type: "POST",
+            cache: false,
+            success: function(data) {
+                console.log("成功L"+JSON.stringify(data))
+                if(data.code==200){
+                    console.log("成功L"+JSON.stringify(data))
+                    message.info('保存成功');
+                }
+                this.setState({
+                    visible: false,
+                    loading: false
+                });
+
+            }.bind(this),
+            error:function (data) {
+                this.setState({
+                    visible: false,
+                    loading: false
+                });
+            }.bind(this)
+        });
     };
 
     handleCancel = e => {
@@ -248,7 +236,6 @@ class OrdSearch extends React.Component{
     };
     //检验确定保存方法
     handleOkLis = (e,type) => {
-        console.log(e);
         this.setState({loading: true });
         if('lis'==type){
             var dataOld=this.refs['lis'].state.ordData.dataList[0];
