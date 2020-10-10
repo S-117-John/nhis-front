@@ -111,12 +111,14 @@ class DrugIndex extends React.Component{
     //查询药品明细
     getBdPd(pkPd) {
         $.ajax({
-            url: window.g.nhisApi+"nhis/mobile/drug/list?ids="+pkPd,
+            url: window.g.nhisApi+"nhis/mobile/drug?pkPd="+pkPd,
             dataType: 'json',
             cache: false,
             success: function(data) {
                 console.log("药品明细："+data.data);
-                this.setState({ordDataList: data.data});
+                let ordList = [];
+                ordList.push(data.data);
+                this.setState({ordDataList: ordList});
             }.bind(this)
         });
     }

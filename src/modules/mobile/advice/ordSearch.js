@@ -64,7 +64,7 @@ class OrdSearch extends React.Component{
         if(record.flagDurg!=null&&record.flagDurg=='1'){
             //跳转至药品明细界面
             this.state.listPkPd.push(record.key);
-            this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.props.currentDeptCode+"/"+this.state.listPkPd);
+            this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.props.currentDeptCode+"/"+record.key);
         }
         else if(record.codeOrdType!=null&&record.codeOrdType=='02'){
 

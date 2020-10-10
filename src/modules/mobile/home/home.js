@@ -351,17 +351,31 @@ class Home extends React.Component {
     }
     //选中项发生变化时的回调
     onSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log("onSelectChange")
         this.setState({
             selectedRowKeys: selectedRowKeys
+        },()=>{
+            console.log(this.state.selectedRowKeys)
         });
+
     };
 
 
     //用户手动选择/取消选择某行的回调
     rowSelect(record, selected, selectedRows, nativeEvent) {
+        // this.setState({
+        //     record: record,
+        //     selected: selected,
+        // });
+        let recordKeys = this.state.selectedRowKeys;
+        console.log(JSON.stringify(record))
+
+        recordKeys.push("402881947511d072017511dd7fa60009")
         this.setState({
-            record: record,
-            selected: selected,
+            selectedRowKeys: recordKeys
+        },()=>{
+            console.log("rowSelect")
+            console.log(this.state.selectedRowKeys)
         });
 
     }
