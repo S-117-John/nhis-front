@@ -18,7 +18,7 @@ import $ from 'jquery'
 import Head from "../common/head";
 import {Link} from "react-router-dom";
 import ProTable, {ProColumns} from '@ant-design/pro-table';
-import {PlusOutlined, StopOutlined, DeleteOutlined, EditOutlined,ExclamationCircleOutlined} from '@ant-design/icons';
+import {PlusOutlined, StopOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 import moment from 'moment';
 import styles from "./home.css"
 import StopOrdItem from "./stopOrdItem";
@@ -26,7 +26,7 @@ import StopOrdItem from "./stopOrdItem";
 
 const ordStopDataList = [];
 
-const { confirm } = Modal;
+const {confirm} = Modal;
 
 class Home extends React.Component {
 
@@ -45,10 +45,10 @@ class Home extends React.Component {
         ordStopDataList: ordStopDataList,
         record: null,//选中行记录
         selected: null,//选中状态
-        stopTime:null,//停止时间
-        isDisabled:false,//按钮不可用
-        api:window.g,
-        loading:false ,//加载
+        stopTime: null,//停止时间
+        isDisabled: false,//按钮不可用
+        api: window.g,
+        loading: false,//加载
 
     };
 
@@ -63,14 +63,16 @@ class Home extends React.Component {
     //停止医嘱
     stopOrder(event) {
         let count = this.state.selectedRowKeys.length;
-        if(count === 0) {
+        if (count === 0) {
             notification.open({
                 message: '提示',
                 description: "请选择数据",
             });
             return;
         }
-        let newArray = this.state.tableData.filter((item,index,arr)=>{return this.state.selectedRowKeys.indexOf(item.pkCnord)>-1;});
+        let newArray = this.state.tableData.filter((item, index, arr) => {
+            return this.state.selectedRowKeys.indexOf(item.pkCnord) > -1;
+        });
         this.setState({
             visibleStop: true,
             ordStopDataList: newArray
@@ -83,8 +85,7 @@ class Home extends React.Component {
         const ordStopList = [];
         this.state.ordStopDataList.map((value, index) => {
             value.dateStop = this.state.stopTime;
-            var ordData = this.refs['stop'+index].state.ordData;
-            console.log(ordData)
+            var ordData = this.refs['stop' + index].state.ordData;
             ordData.dateStop = this.state.stopTime;
             // ordData.lastNum=this.state.ordData.lastNum
             ordStopList.push(ordData)
@@ -92,10 +93,10 @@ class Home extends React.Component {
 
 
         $.ajax({
-            url: this.state.api.nhisApi+"nhis/mobile/ord/stop",
-            type:"PUT",
-            data: {param:JSON.stringify(ordStopList)},
-            success: function(data) {
+            url: this.state.api.nhisApi + "nhis/mobile/ord/stop",
+            type: "PUT",
+            data: {param: JSON.stringify(ordStopList)},
+            success: function (data) {
                 message.info('执行成功');
                 this.listPatientOrder();
 
@@ -122,21 +123,23 @@ class Home extends React.Component {
             return;
         }
         //获取选中医嘱
-        let newArray = this.state.tableData.filter((item,index,arr)=>{return this.state.selectedRowKeys.indexOf(item.pkCnord)>-1;});
+        let newArray = this.state.tableData.filter((item, index, arr) => {
+            return this.state.selectedRowKeys.indexOf(item.pkCnord) > -1;
+        });
         let data = {
-            cnOrdList:newArray,
-            codeDept:this.props.match.params.currentDeptCode
+            cnOrdList: newArray,
+            codeDept: this.props.match.params.currentDeptCode
         }
         $.ajax({
-            url: this.state.api.nhisApi+"nhis/mobile/ord/sign",
-            type:"PUT",
-            data: {param:JSON.stringify(data)},
-            success: function(data) {
+            url: this.state.api.nhisApi + "nhis/mobile/ord/sign",
+            type: "PUT",
+            data: {param: JSON.stringify(data)},
+            success: function (data) {
                 message.info('执行成功');
                 this.listPatientOrder();
 
             }.bind(this),
-            error: function (data){
+            error: function (data) {
                 notification.open({
                     message: '提示',
                     description: "签署失败",
@@ -204,7 +207,6 @@ class Home extends React.Component {
     };
     //删除取消事件
     handleCancelDelOrder = e => {
-        console.log(e);
         this.setState({
             visibleDel: false,
         });
@@ -213,15 +215,15 @@ class Home extends React.Component {
     //查询患者医嘱信息
     listPatientOrder() {
         this.setState({
-            loading:true
+            loading: true
         })
         this.serverRequest = $.get(this.state.api.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.hosId, function (result) {
             this.setState({
-                loading:false
+                loading: false
             })
             if (result.code == 400) {
                 this.setState({
-                    isDisabled:true
+                    isDisabled: true
                 })
                 notification.open({
                     message: '提示',
@@ -342,10 +344,16 @@ class Home extends React.Component {
         });
     };
 
-
+    getArrDifference(arr1, arr2) {
+        return arr1.concat(arr2).filter(function(v, i, arr) {
+            return arr.indexOf(v) === arr.lastIndexOf(v);
+        });
+    }
     //选中项发生变化时的回调
     onSelectChange = (selectedRowKeys, selectedRows) => {
-        this.setState({selectedRowKeys});
+        this.setState({
+            selectedRowKeys: selectedRowKeys
+        });
     };
 
 
@@ -353,63 +361,31 @@ class Home extends React.Component {
     rowSelect(record, selected, selectedRows, nativeEvent) {
         this.setState({
             record: record,
-            selected: selected
-        })
-        // if(!selected){
-        //     console.log('选中的项'+this.state.selectedRowKeys)
-        //     let pNo = record.ordsnParent;
-        //     this.state.tableData.map((item,index)=>{
-        //         if(item.ordsnParent==pNo){
-        //             //获取元素位置
-        //             var index = this.state.selectedRowKeys.indexOf(item.pkCnOrd)
-        //             this.state.selectedRowKeys.splice(index,1);
-        //
-        //         }
-        //     });
-        //     let newArray = this.state.selectedRowKeys;
-        //     console.log('选中后的项'+this.state.selectedRowKeys)
-        //     this.setState({
-        //         selectedRowKeys:newArray
-        //     })
-        // }else{
-        //     console.log('选中项')
-        //     this.state.tableData.map((item,index)=>{
-        //         if(item.ordsnParent==record.ordsnParent){
-        //             console.log(item.ordsnParent+"/"+record.ordsnParent);
-        //
-        //             this.state.selectedRowKeys.push(item.pkCnord)
-        //
-        //         }
-        //     });
-        //     console.log('a-'+ this.state.selectedRowKeys)
-        //     let selectedRowKeys = this.state.selectedRowKeys.filter((item,index,arr)=>{
-        //         return arr.indexOf(item,0)===index;
-        //     })
-        //
-        //     // this.setState({selectedRowKeys:newArray});
-        //     this.setState({selectedRowKeys});
-        // }
+            selected: selected,
+        });
+
     }
 
     //确认删除
     showDeletePromiseConfirm() {
         confirm({
             title: '确认删除当前医嘱?',
-            icon: <ExclamationCircleOutlined />,
+            icon: <ExclamationCircleOutlined/>,
             content: '',
             onOk() {
                 return new Promise((resolve, reject) => {
                     setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
                 }).catch(() => console.log('Oops errors!'));
             },
-            onCancel() {},
+            onCancel() {
+            },
         });
     }
 
     //设置按钮不可用
-    setBtnDisable(result){
+    setBtnDisable(result) {
         this.setState({
-            isDisabled:result
+            isDisabled: result
         })
     }
 
@@ -592,136 +568,140 @@ class Home extends React.Component {
                 <Spin spinning={this.state.loading}>
 
 
-                <div style={{margin: 20}}>
+                    <div style={{margin: 20}}>
 
-                    <Head pkPv={this.props.match.params.hosId} doctorCode={this.props.match.params.doctorCode} setBtnDisable={this.setBtnDisable}/>
+                        <Head pkPv={this.props.match.params.hosId} doctorCode={this.props.match.params.doctorCode}
+                              setBtnDisable={this.setBtnDisable}/>
 
-                    <Divider/>
-
-                    <div>
-                        <Row>
-                            <Col span={6}>
-                                <div>
-                                    <Radio.Group defaultValue="a" buttonStyle="solid" onChange={this.RadioGroup}>
-                                        <Radio.Button value="a">全部</Radio.Button>
-                                        <Radio.Button value="b">临时</Radio.Button>
-                                        <Radio.Button value="c">长期</Radio.Button>
-                                    </Radio.Group>
-                                </div>
-                            </Col>
-
-                            <Col span={6}>
-                                <div>
-                                    <Radio.Group defaultValue="a" buttonStyle="solid" onChange={this.RadioGroupNow}>
-                                        <Radio.Button value="a">全部</Radio.Button>
-                                        <Radio.Button value="b">当前</Radio.Button>
-                                    </Radio.Group>
-                                </div>
-                            </Col>
-
-                            <Col span={12}>
-                                <div>
-                                    <Link
-                                        to={"/medicalAdviceSearch/" + this.props.match.params.hosId + "/" + this.props.match.params.doctorCode + "/" + this.props.match.params.currentDeptCode}>
-                                        <Button
-                                            disabled={this.state.isDisabled}
-                                            type="primary" style={{marginLeft: 20}}><PlusOutlined/>
-                                            新医嘱</Button>
-                                    </Link>
-                                    <Button
-                                        disabled={this.state.isDisabled}
-                                        type="primary" onClick={(event) => this.stopOrder(event)}
-                                            style={{marginLeft: 20}}><StopOutlined/>停嘱</Button>
-                                    <Button
-                                        disabled={this.state.isDisabled}
-                                        type="primary" onClick={(event) => this.signOrder(event)}
-                                            style={{marginLeft: 20}}><EditOutlined/>签署</Button>
-                                    <Button
-                                        disabled={this.state.isDisabled}
-                                        type="primary" onClick={(event) => this.delOrder(event)}
-                                            style={{marginLeft: 20}}><DeleteOutlined/>删除</Button>
-                                </div>
-
-                            </Col>
-                        </Row>
                         <Divider/>
-                        <div style={{marginTop: 20}}>
-                            <ProTable
-                                columns={columns}
-                                search={false}
-                                options={false}
-                                scroll={{x: 1500, y: 400}}
-                                bordered
-                                pagination={false}
-                                dataSource={this.state.tableData}
-                                rowSelection={rowSelection}
-                                onChange={this.handleChange}
-                                rowKey={record => record.key}
-                                // rowClassName={styles.polarGreen2}
-                                rowClassName={record => (record.flagSign == '1' ? 'polarGreen2' : '')}
-                                tableAlertRender={({selectedRowKeys, selectedRows}) => {
-                                    return (
-                                        <div style={{textAlign: "left"}}>
-                                            当前共选中{selectedRowKeys.length} 项
-                                        </div>
-                                    );
-                                    // return(
-                                    //     <div style={{ textAlign:"left"}}>
-                                    //         当前共选中{selectedRowKeys.length} 项，共有 {selectedRows.reduce((pre, item) => {
-                                    //         if (null!=item.nameEmpOrd && item.nameEmpOrd.length === 0) {
-                                    //             return pre + 1;
-                                    //         }
-                                    //         return pre;
-                                    //     }, 0)} 项未签署
-                                    //     </div>
-                                    // );
-                                }}
-                                tableAlertOptionRender={(props) => {
-                                    const {onCleanSelected} = props;
-                                    return (
-                                        <div style={{textAlign: "right"}}>
-                                            <a onClick={onCleanSelected}>清空</a>
-                                        </div>
-                                    );
-                                }}
-                            />
-                        </div>
-                    </div>
-
-                    <Drawer
-                        width={500}
-                        placement="right"
-                        closable={false}
-                        onClose={this.onClose}
-                        visible={this.state.visible}
-                    >
-                        <h1>医嘱执行情况</h1>
 
                         <div>
-                            <Descriptions column={1}>
-                                <Descriptions.Item
-                                    label="医嘱期效">{this.state.ordDetail.euAlways === '1' ? '临时' : '长期'}</Descriptions.Item>
-                                <Descriptions.Item label="开始时间">{this.state.ordDetail.dateStart}</Descriptions.Item>
-                                <Descriptions.Item label="医嘱内容">{this.state.ordDetail.nameOrd}</Descriptions.Item>
-                                {/* <Descriptions.Item label="频次">{this.state.ordDetail.nameFreq}</Descriptions.Item> */}
-                                <Descriptions.Item label="用量">{this.state.ordDetail.quan}</Descriptions.Item>
-                                <Descriptions.Item label="医嘱规格">{this.state.ordDetail.spec}</Descriptions.Item>
-                                <Descriptions.Item label="首日次数">{this.state.ordDetail.firstNum}</Descriptions.Item>
-                                <Descriptions.Item label="末日次数">{this.state.ordDetail.lastNum}</Descriptions.Item>
+                            <Row>
+                                <Col span={6}>
+                                    <div>
+                                        <Radio.Group defaultValue="a" buttonStyle="solid" onChange={this.RadioGroup}>
+                                            <Radio.Button value="a">全部</Radio.Button>
+                                            <Radio.Button value="b">临时</Radio.Button>
+                                            <Radio.Button value="c">长期</Radio.Button>
+                                        </Radio.Group>
+                                    </div>
+                                </Col>
 
-                            </Descriptions>
+                                <Col span={6}>
+                                    <div>
+                                        <Radio.Group defaultValue="a" buttonStyle="solid" onChange={this.RadioGroupNow}>
+                                            <Radio.Button value="a">全部</Radio.Button>
+                                            <Radio.Button value="b">当前</Radio.Button>
+                                        </Radio.Group>
+                                    </div>
+                                </Col>
+
+                                <Col span={12}>
+                                    <div>
+                                        <Link
+                                            to={"/medicalAdviceSearch/" + this.props.match.params.hosId + "/" + this.props.match.params.doctorCode + "/" + this.props.match.params.currentDeptCode}>
+                                            <Button
+                                                disabled={this.state.isDisabled}
+                                                type="primary" style={{marginLeft: 20}}><PlusOutlined/>
+                                                新医嘱</Button>
+                                        </Link>
+                                        <Button
+                                            disabled={this.state.isDisabled}
+                                            type="primary" onClick={(event) => this.stopOrder(event)}
+                                            style={{marginLeft: 20}}><StopOutlined/>停嘱</Button>
+                                        <Button
+                                            disabled={this.state.isDisabled}
+                                            type="primary" onClick={(event) => this.signOrder(event)}
+                                            style={{marginLeft: 20}}><EditOutlined/>签署</Button>
+                                        <Button
+                                            disabled={this.state.isDisabled}
+                                            type="primary" onClick={(event) => this.delOrder(event)}
+                                            style={{marginLeft: 20}}><DeleteOutlined/>删除</Button>
+                                    </div>
+
+                                </Col>
+                            </Row>
                             <Divider/>
-                            <Descriptions column={1}>
-                                <Descriptions.Item label="录入人">{this.state.ordDetail.nameEmpInput}</Descriptions.Item>
-                                <Descriptions.Item label="录入时间">{this.state.ordDetail.dateEnter}</Descriptions.Item>
-                                <Descriptions.Item label="开立医生">{this.state.ordDetail.nameEmpOrd}</Descriptions.Item>
-                                <Descriptions.Item label="核对人">{this.state.ordDetail.nameEmpChk}</Descriptions.Item>
-                                <Descriptions.Item label="核对时间">{this.state.ordDetail.dateChk}</Descriptions.Item>
-                                <Descriptions.Item label="计划执行时间">{this.state.ordDetail.datePlanEx}</Descriptions.Item>
-                                <Descriptions.Item
-                                    label="最后一次执行时间">{this.state.ordDetail.dateLastEx}</Descriptions.Item>
-                            </Descriptions>
-                            {/* <Descriptions column={1}>
+                            <div style={{marginTop: 20}}>
+                                <ProTable
+                                    columns={columns}
+                                    search={false}
+                                    options={false}
+                                    scroll={{x: 1500, y: 400}}
+                                    bordered
+                                    pagination={false}
+                                    dataSource={this.state.tableData}
+                                    rowSelection={rowSelection}
+                                    onChange={this.handleChange}
+                                    rowKey={record => record.key}
+                                    // rowClassName={styles.polarGreen2}
+                                    rowClassName={record => (record.flagSign == '1' ? 'polarGreen2' : '')}
+                                    tableAlertRender={({selectedRowKeys, selectedRows}) => {
+                                        return (
+                                            <div style={{textAlign: "left"}}>
+                                                当前共选中{selectedRowKeys.length} 项
+                                            </div>
+                                        );
+                                        // return(
+                                        //     <div style={{ textAlign:"left"}}>
+                                        //         当前共选中{selectedRowKeys.length} 项，共有 {selectedRows.reduce((pre, item) => {
+                                        //         if (null!=item.nameEmpOrd && item.nameEmpOrd.length === 0) {
+                                        //             return pre + 1;
+                                        //         }
+                                        //         return pre;
+                                        //     }, 0)} 项未签署
+                                        //     </div>
+                                        // );
+                                    }}
+                                    tableAlertOptionRender={(props) => {
+                                        const {onCleanSelected} = props;
+                                        return (
+                                            <div style={{textAlign: "right"}}>
+                                                <a onClick={onCleanSelected}>清空</a>
+                                            </div>
+                                        );
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        <Drawer
+                            width={500}
+                            placement="right"
+                            closable={false}
+                            onClose={this.onClose}
+                            visible={this.state.visible}
+                        >
+                            <h1>医嘱执行情况</h1>
+
+                            <div>
+                                <Descriptions column={1}>
+                                    <Descriptions.Item
+                                        label="医嘱期效">{this.state.ordDetail.euAlways === '1' ? '临时' : '长期'}</Descriptions.Item>
+                                    <Descriptions.Item label="开始时间">{this.state.ordDetail.dateStart}</Descriptions.Item>
+                                    <Descriptions.Item label="医嘱内容">{this.state.ordDetail.nameOrd}</Descriptions.Item>
+                                    {/* <Descriptions.Item label="频次">{this.state.ordDetail.nameFreq}</Descriptions.Item> */}
+                                    <Descriptions.Item label="用量">{this.state.ordDetail.quan}</Descriptions.Item>
+                                    <Descriptions.Item label="医嘱规格">{this.state.ordDetail.spec}</Descriptions.Item>
+                                    <Descriptions.Item label="首日次数">{this.state.ordDetail.firstNum}</Descriptions.Item>
+                                    <Descriptions.Item label="末日次数">{this.state.ordDetail.lastNum}</Descriptions.Item>
+
+                                </Descriptions>
+                                <Divider/>
+                                <Descriptions column={1}>
+                                    <Descriptions.Item
+                                        label="录入人">{this.state.ordDetail.nameEmpInput}</Descriptions.Item>
+                                    <Descriptions.Item label="录入时间">{this.state.ordDetail.dateEnter}</Descriptions.Item>
+                                    <Descriptions.Item
+                                        label="开立医生">{this.state.ordDetail.nameEmpOrd}</Descriptions.Item>
+                                    <Descriptions.Item label="核对人">{this.state.ordDetail.nameEmpChk}</Descriptions.Item>
+                                    <Descriptions.Item label="核对时间">{this.state.ordDetail.dateChk}</Descriptions.Item>
+                                    <Descriptions.Item
+                                        label="计划执行时间">{this.state.ordDetail.datePlanEx}</Descriptions.Item>
+                                    <Descriptions.Item
+                                        label="最后一次执行时间">{this.state.ordDetail.dateLastEx}</Descriptions.Item>
+                                </Descriptions>
+                                {/* <Descriptions column={1}>
                                 <Descriptions.Item label="执行时间">1</Descriptions.Item>
                                 <Descriptions.Item label="执行科室">1</Descriptions.Item>
                                 <Descriptions.Item label="执行状态">1</Descriptions.Item>
@@ -736,30 +716,34 @@ class Home extends React.Component {
                                 <Descriptions.Item label="停嘱医生">1</Descriptions.Item>
                                 <Descriptions.Item label="确认停止">1</Descriptions.Item>
                             </Descriptions> */}
-                        </div>
-                    </Drawer>
+                            </div>
+                        </Drawer>
 
-                </div>
-                <Modal title="停嘱" visible={this.state.visibleStop} destroyOnClose={true}
-                       onOk={this.handleOkStopOrder} onCancel={()=>{this.setState({visibleStop: false})}}>
-                    <Descriptions>
-                        <Descriptions.Item label="停嘱时间">
-                            <DatePicker
-                            format="YYYY-MM-DD HH:mm:ss"
-                            showTime={{defaultValue: moment('00:00:00', 'HH:mm:ss')}}
-                            onChange={(date,dateString)=>this.setState({stopTime:dateString})}
-                        />
-                        </Descriptions.Item>
-                    </Descriptions>
-                    <Divider/>
-                    <div style={{marginTop: 15}}>
-                        {this.state.ordStopDataList.map((item, index) => <StopOrdItem ref={"stop"+index} ordData={item} key={index} index={index}/>)}
                     </div>
-                </Modal>
-                <Modal title="删除" visible={this.state.visibleDel}
-                       onOk={this.handleOkDelOrder} onCancel={this.handleCancelDelOrder}>
-                    <p>确认删除所选医嘱吗？</p>
-                </Modal>
+                    <Modal title="停嘱" visible={this.state.visibleStop} destroyOnClose={true}
+                           onOk={this.handleOkStopOrder} onCancel={() => {
+                        this.setState({visibleStop: false})
+                    }}>
+                        <Descriptions>
+                            <Descriptions.Item label="停嘱时间">
+                                <DatePicker
+                                    format="YYYY-MM-DD HH:mm:ss"
+                                    showTime={{defaultValue: moment('00:00:00', 'HH:mm:ss')}}
+                                    onChange={(date, dateString) => this.setState({stopTime: dateString})}
+                                />
+                            </Descriptions.Item>
+                        </Descriptions>
+                        <Divider/>
+                        <div style={{marginTop: 15}}>
+                            {this.state.ordStopDataList.map((item, index) => <StopOrdItem ref={"stop" + index}
+                                                                                          ordData={item} key={index}
+                                                                                          index={index}/>)}
+                        </div>
+                    </Modal>
+                    <Modal title="删除" visible={this.state.visibleDel}
+                           onOk={this.handleOkDelOrder} onCancel={this.handleCancelDelOrder}>
+                        <p>确认删除所选医嘱吗？</p>
+                    </Modal>
 
                 </Spin>
             </div>
