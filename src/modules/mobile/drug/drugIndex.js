@@ -227,25 +227,27 @@ class DrugIndex extends React.Component{
 //保存
  save(event) {
     this.setState({loading: true });
-    var cnOrdList = [];
     this.resultDataFactory();
-    var jsonData = {
-        cnOrdList : this.state.ordDataList,
-        code : this.props.match.params.doctorCode,
-        codeIp : this.props.match.params.pkPv,
-        saveType : 0,
-        codeDept: this.props.match.params.currentDeptCode
-    };
+     var jsonData = {
+         doctorCode:this.props.match.params.doctorCode,
+         codeIp:this.props.match.params.pkPv,
+         codeDept:this.props.match.params.currentDeptCode,
+         cnOrderList : this.state.ordDataList,
+     };
     $.ajax({
+        contentType: "application/json;charset=UTF-8",//指定消息请求类型
         url: window.g.nhisApi+"nhis/mobile/ord/saveDrug",
-        data:{ordList:JSON.stringify(jsonData)} ,
+        data:JSON.stringify(jsonData),
         type: "POST",
         cache: false,
         success: function(data) {
-            console.log("保存成功");
             this.setState({loading: false });
+            if(data.code==200){
+                this.props.history.push('/home/'+this.props.match.params.pkPv+"/"+this.props.match.params.doctorCode+"/"+this.props.match.params.currentDeptCode);
+            }
+
             //跳转至首页
-            this.props.history.push('/home/'+this.props.match.params.pkPv+"/"+this.props.match.params.doctorCode+"/"+this.props.match.params.currentDeptCode);
+
         }.bind(this),
         error:function (data) {
             console.log("保存失败");

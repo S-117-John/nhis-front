@@ -208,9 +208,7 @@ class OrdSearch extends React.Component{
             type: "POST",
             cache: false,
             success: function(data) {
-                console.log("成功L"+JSON.stringify(data))
                 if(data.code==200){
-                    console.log("成功L"+JSON.stringify(data))
                     message.info('保存成功');
                 }
                 this.setState({
