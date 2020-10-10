@@ -20,14 +20,12 @@ class DrugItem extends React.Component{
     }
 
     change(e){
-        console.log(e.target.value);    //获取修改后的值
         this.setState({
             dosage : e.target.value
         })
     }
 
     noteChange(e){
-        console.log(e.target.value);    //获取修改后的值
         this.setState({
             note : e.target.value
         })
@@ -35,7 +33,6 @@ class DrugItem extends React.Component{
 
     //加急
     emergency(checked, event) {
-        console.log(checked);    //获取修改后的值
         this.setState({
             emergency : checked
         })
@@ -43,7 +40,6 @@ class DrugItem extends React.Component{
 
     //自备
     own(checked, event) {
-        console.log(checked);    //获取修改后的值
         this.setState({
             own : checked
         })
@@ -51,7 +47,6 @@ class DrugItem extends React.Component{
 
     //皮试
     skin(checked, event) {
-        console.log(checked);    //获取修改后的值
         this.setState({
             skin : checked
         })

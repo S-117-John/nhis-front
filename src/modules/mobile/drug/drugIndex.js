@@ -256,6 +256,11 @@ class DrugIndex extends React.Component{
     });
 }
 
+
+    goHome(){
+        //跳转至首页
+        this.props.history.push('/home/'+this.props.match.params.pkPv+"/"+this.props.match.params.doctorCode+"/"+this.props.match.params.currentDeptCode);
+    }
     render(){
         return(
             <div style={{margin:30}}>
@@ -267,7 +272,7 @@ class DrugIndex extends React.Component{
                             <Button type="primary" onClick={this.showModal}>新增子医嘱</Button>
                             <Button type="primary" onClick={(event)=>this.save(event)}>保存</Button>
                             <Button type="primary" onClick={(event)=>this.sign(event)}>签署</Button>
-                            <Button type="primary">返回</Button>
+                            <Button type="primary" onClick={(event)=>this.goHome(event)}>返回</Button>
                         </Space>
                     </div>
                     <Divider/>
