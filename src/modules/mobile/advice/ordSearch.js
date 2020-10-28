@@ -80,7 +80,7 @@ class OrdSearch extends React.Component{
             }.bind(this));
 
         }else if(record.codeOrdType!=null&&record.codeOrdType=='03'){
-            $.get(window.g.nhisApi + "nhis/mobile/ord/pd/getLisOrRisDetail?pkOrd=" + record.key+"&LisOrRis="+record.codeOrdType, function (result) {
+            $.get(window.g.nhisApi + "nhis/mobile/ord/lis/info?pkOrd=" + record.key, function (result) {
                 console.log(result);
                 if (result.code == 200) {
                     this.setState({
@@ -236,49 +236,41 @@ class OrdSearch extends React.Component{
     //检验确定保存方法
     handleOkLis = (e,type) => {
         this.setState({loading: true });
-        if('lis'==type){
-            var dataOld=this.refs['lis'].state.ordData.dataList[0];
-            var dataNew=this.refs['lis'].state;
-            var exeDept=dataNew.exeDept;
-            if(!exeDept){
-                exeDept=this.refs['lis'].state.ordData.exDeptList[0].pkDept;
-            }
-            var dtSamptype=dataNew.dtSamptype;
-            if(!dtSamptype){
-                dtSamptype=dataOld.dtSamptype;
-            }
-            var saveData={dtSamptype:dtSamptype,dtTubetype:dataOld.dtContype,dtColtype:dataOld.dtColltype,delFlag:"0",
-                dateStart:dataNew.startTime,codeApply:this.refs['lis'].state.ordData.codeApple[0],pkPv:null,pkPi:null,
-                pkDeptExec:exeDept,euStatusOrd:"0",pkOrd:dataOld.pkOrd,codeOrd:dataOld.code,nameOrd:dataOld.name,
-                codeOrdType:dataOld.codeOrdtype,flagBl:dataOld.flagCg,quan:1,flagEmer:"0",noteOrd:dataNew.note,
-                priceCg:dataOld.pricestr,euOrdtype:dataOld.euOrdtype};
-            var saveDataList=new Array();
-            saveDataList[0]=saveData;
-            var jsonData = {
-                labApplyList : saveDataList,
-                code : this.props.match.params.doctorCode,
+        $.ajax({
+            url: window.g.nhisApi+"nhis/mobile/ord/saveLisApply",
+            dataType: 'JSON',
+            data:{
+                doctorCode : this.props.match.params.doctorCode,
                 codeIp : this.props.match.params.pkPv,
-                codeDept:this.props.currentDeptCode
-            };
-            $.ajax({
-                url: window.g.nhisApi+"nhis/mobile/ord/saveLisApplyList",
-                //dataType: 'json',
-                data:{param:JSON.stringify(jsonData)} ,
-                type: "POST",
-                cache: false,
-                success: function(data) {
-                    console.log("保存成功");
-                    this.setState({
-                        visibleLis: false,
-                    });
-                    this.setState({loading: false });
-                }.bind(this),
-                error:function (data) {
-                    this.setState({loading: false });
-                }.bind(this)
-            });
-        }
-        // Modal.destroyAll();
+                codeDept:this.props.currentDeptCode,
+                pkOrd:this.refs['lis'].state.ordData.pkOrd,
+                pkDeptExec:this.refs['lis'].state.exeDept,
+                dateStart:this.refs['lis'].state.startTime,
+                descBody:this.refs['lis'].state.body,
+                purpose:this.refs['lis'].state.purpose,
+                noteDise:this.refs['lis'].state.description,
+                note:this.refs['lis'].state.note,
+                codeApply:this.refs['lis'].state.ordData.codeApply
+            } ,
+            type: "POST",
+            cache: false,
+            success: function(data) {
+                if(data.code==200){
+                    message.info('保存成功');
+                }
+                this.setState({
+                    visible: false,
+                    loading: false
+                });
+
+            }.bind(this),
+            error:function (data) {
+                this.setState({
+                    visible: false,
+                    loading: false
+                });
+            }.bind(this)
+        });
     };
     handleCancelLis = e => {
         console.log(e);

@@ -40,6 +40,7 @@ class LisNew extends React.Component {
         this.state = {
             ordData: this.props.ordData,
             loading:false,
+            exeDept:this.props.ordData.deptList[0].pkDept
         };
     }
 
@@ -57,9 +58,8 @@ class LisNew extends React.Component {
 
     componentDidMount() {
 
-        this.serverRequest = this.listEmpOrd();
 
-        console.log("医嘱ord:" + this.props.doctorCode);
+
     }
 
     componentWillUnmount() {
@@ -83,17 +83,7 @@ class LisNew extends React.Component {
     };
 
 
-    // 获取检查模板
-    listEmpOrd() {
-        $.ajax({
-            url: window.g.nhisApi + "nhis/mobile/ord/ris/temp",
-            dataType: 'json',
-            cache: false,
-            success: function (data) {
-                this.setState({treeData: data.data});   // 注意这里
-            }.bind(this)
-        });
-    }
+
 
     toAdviceSearch(value) {
         this.props.history.push('/medicalAdviceSearch/' + this.props.pkPv + "/" + this.props.doctorCode + "/" + value)
@@ -109,7 +99,6 @@ class LisNew extends React.Component {
     }
 
     destroyAll() {
-        console.log(23123213213);
         this.props.destroyModal();
     }
 
@@ -117,15 +106,7 @@ class LisNew extends React.Component {
         return (
             <div>
                 <Spin tip="Loading..." spinning={this.state.loading}>
-                    {/*<div>*/}
-                    {/*    <Space>*/}
-                    {/*        <Button type="primary">保存</Button>*/}
-                    {/*        <Button type="primary">签署</Button>*/}
-                    {/*        <Button type="primary">删除</Button>*/}
-                    {/*        <Button type="primary" onClick={()=>this.destroyAll()}>返回</Button>*/}
-                    {/*    </Space>*/}
-                    {/*</div>*/}
-                    {/*<Divider/>*/}
+
                     <div>
                         <Form
                             {...layout}
@@ -139,19 +120,20 @@ class LisNew extends React.Component {
                             </Form.Item>
 
                             <div style={{textAlign:'center'}}>
-                                <h1>{this.state.ordData.dataList[0].name}</h1>
-                                <span>类型：{this.state.ordData.dataList[0].nameSamptype}   单价: {this.state.ordData.dataList[0].pricestr} 申请单号：{this.state.ordData.codeApple[0]}</span>
+                                <h1>{this.state.ordData.name}</h1>
+                                <span>类型：{this.state.ordData.nameSamptype}   单价: {this.state.ordData.pricestr} 申请单号：{this.state.ordData.codeApple}</span>
                                 <br/>
                             </div>
                             <Form.Item label="执行科室" rules={[{required: true, message: '请选择执行科室'}]} name="exDept" onSelect={value=>this.state.exeDept=value}  >
-                                <Select style={{ width: 290 }} defaultValue={this.state.ordData.exDeptList[0].pkDept}>
-                                    {this.state.ordData.exDeptList.map((item,index) => <Option  key={item.pkDept} value={item.pkDept} >{item.nameDept}</Option>)}
+                                <Select style={{ width: 290 }} defaultValue={this.state.ordData.deptList[0].pkDept}>
+                                    {this.state.ordData.deptList.map((item,index) => <Option  key={item.pkDept} value={item.pkDept} >{item.nameDept}</Option>)}
                                 </Select>
                             </Form.Item>
                             <Form.Item label="标本类型"  name="dtType">
-                                <Select style={{ width: 290 }} defaultValue={this.state.ordData.dataList[0].dtSamptype} onSelect={value=>this.state.dtSamptype=value}>
-                                    {this.state.ordData.listType.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}
-                                </Select>
+                                {/*<Select style={{ width: 290 }}  onSelect={value=>this.state.dtSamptype=value}>*/}
+                                {/*    {this.state.ordData.specimenType.map((item,index) => <Option  key={item.code} value={item.code} >{item.name}</Option>)}*/}
+                                {/*</Select>*/}
+                                {this.state.ordData.specimenType}
                             </Form.Item>
                             <Form.Item
                                 label="采集方式"
