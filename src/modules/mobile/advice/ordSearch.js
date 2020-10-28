@@ -259,14 +259,14 @@ class OrdSearch extends React.Component{
                     message.info('保存成功');
                 }
                 this.setState({
-                    visible: false,
+                    visibleLis: false,
                     loading: false
                 });
 
             }.bind(this),
             error:function (data) {
                 this.setState({
-                    visible: false,
+                    visibleLis: false,
                     loading: false
                 });
             }.bind(this)
