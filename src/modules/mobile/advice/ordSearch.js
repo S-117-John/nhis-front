@@ -329,7 +329,7 @@ class OrdSearch extends React.Component{
         Modal.destroyAll();
     }
     goBack(){
-        window.history.back(-1)
+        this.props.history.push('/home/'+this.props.match.params.pkPv+"/"+this.props.match.params.doctorCode+"/"+this.props.match.params.currentDeptCode);
     }
 
 
@@ -377,7 +377,7 @@ class OrdSearch extends React.Component{
                             </Col>
                             <Col span={1}></Col>
                             <Col>
-                                <Button type="primary" onClick={this.goBack}><RollbackOutlined />取消</Button>
+                                <Button type="primary" onClick={(event)=>this.goBack(event)}><RollbackOutlined />返回</Button>
                             </Col>
                         </Row>
 
