@@ -585,7 +585,7 @@ class Home extends React.Component {
                     <div style={{margin: 20}}>
 
                         <Head pkPv={this.props.match.params.hosId} doctorCode={this.props.match.params.doctorCode}
-                              setBtnDisable={this.setBtnDisable}/>
+                              setBtnDisable={this.setBtnDisable} pvCode={this.props.match.params.pvCode}/>
 
                         <Divider/>
 

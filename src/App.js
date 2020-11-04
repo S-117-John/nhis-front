@@ -12,7 +12,7 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <Route path="/home/:hosId/:doctorCode/:currentDeptCode" component={ Home } />
+        <Route path="/home/:hosId/:doctorCode/:currentDeptCode/:pvCode" component={ Home } />
         <Route path="/medicalAdvice/:pkPv/:doctorCode" component={ MedicalAdvice } />
         <Route path="/medicalAdviceSearch/:pkPv/:doctorCode/:currentDeptCode" component={ MedicalAdviceSearch} />
         <Route path="/drugIndex/:pkPv/:doctorCode/:currentDeptCode/:pkPd" component={ DrugIndex} />

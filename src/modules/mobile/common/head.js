@@ -26,8 +26,7 @@ class Head extends React.Component {
 
 
 
-        this.serverRequest = $.get(this.state.api.nhisApi+"nhis/mobile/patient?code="+this.props.pkPv, function (result) {
-            console.log(result);
+        this.serverRequest = $.get(this.state.api.nhisApi+"nhis/mobile/patient?code="+this.props.pvCOde, function (result) {
             if(result.code==400){
                 this.props.setBtnDisable(true);
                 notification.open({
