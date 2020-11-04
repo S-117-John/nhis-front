@@ -185,7 +185,7 @@ class Home extends React.Component {
                     message: '提示',
                     description: result.msg,
                 });
-                $.get(this.state.api.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.hosId, function (result) {
+                $.get(this.state.api.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.pvCode, function (result) {
                     if (result.code == 400) {
                         notification.open({
                             message: '提示',
@@ -217,7 +217,7 @@ class Home extends React.Component {
         this.setState({
             loading: true
         })
-        this.serverRequest = $.get(this.state.api.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.hosId, function (result) {
+        this.serverRequest = $.get(this.state.api.nhisApi + "/nhis/mobile/ord?pkPv=" + this.props.match.params.pvCode, function (result) {
             this.setState({
                 loading: false
             })
