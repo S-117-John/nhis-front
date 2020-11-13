@@ -64,7 +64,7 @@ class OrdSearch extends React.Component{
         if(record.flagDurg!=null&&record.flagDurg=='1'){
             //跳转至药品明细界面
             this.state.listPkPd.push(record.key);
-            this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.props.currentDeptCode+"/"+record.key);
+            this.props.history.push('/drugIndex/'+this.props.pkPv+"/"+this.props.doctorCode+"/"+this.props.currentDeptCode+"/"+record.key+"/"+this.props.match.params.pvCode);
         }
         else if(record.codeOrdType!=null&&record.codeOrdType=='02'){
 
@@ -312,7 +312,6 @@ class OrdSearch extends React.Component{
     rowClick(record){
         var pkPds=[];
         pkPds.push(record.key)
-        pkPds.push("123213")
         this.setState({listPkPd:pkPds})
     }
 

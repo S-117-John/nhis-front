@@ -14,8 +14,8 @@ function App() {
       <Router>
         <Route path="/home/:hosId/:doctorCode/:currentDeptCode/:pvCode" component={ Home } />
         <Route path="/medicalAdvice/:pkPv/:doctorCode" component={ MedicalAdvice } />
-        <Route path="/medicalAdviceSearch/:pkPv/:doctorCode/:currentDeptCode" component={ MedicalAdviceSearch} />
-        <Route path="/drugIndex/:pkPv/:doctorCode/:currentDeptCode/:pkPd" component={ DrugIndex} />
+        <Route path="/medicalAdviceSearch/:pkPv/:doctorCode/:currentDeptCode/:pvCode" component={ MedicalAdviceSearch} />
+        <Route path="/drugIndex/:pkPv/:doctorCode/:currentDeptCode/:pkPd/:pvCode" component={ DrugIndex} />
       </Router>
     </div>
   );

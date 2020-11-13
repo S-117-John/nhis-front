@@ -16,11 +16,16 @@ class MedicalAdviceSearch extends React.Component{
     render(){
         return(
             <div style={{margin: 20}}>
-                <Head pkPv={this.props.match.params.pkPv} doctorCode={this.props.match.params.doctorCode}/>
+                <Head pkPv={this.props.match.params.pkPv}
+                      doctorCode={this.props.match.params.doctorCode}
+                      pvCode={this.props.match.params.pvCode}/>
 
                 <Divider/>
 
-                <OrdSearch doctorCode={this.props.match.params.doctorCode} pkPv={this.props.match.params.pkPv} currentDeptCode={this.props.match.params.currentDeptCode}/>
+                <OrdSearch doctorCode={this.props.match.params.doctorCode}
+                           pkPv={this.props.match.params.pkPv}
+                           currentDeptCode={this.props.match.params.currentDeptCode}
+                           pvCode={this.props.match.params.pvCode}/>
             </div>
         );
     }

@@ -272,7 +272,9 @@ class DrugIndex extends React.Component{
         return(
             <div style={{margin:30}}>
                 <Spin spinning={this.state.loading}>
-                    <Head pkPv={this.props.match.params.pkPv} doctorCode={this.props.match.params.doctorCode}/>
+                    <Head pkPv={this.props.match.params.pkPv}
+                          doctorCode={this.props.match.params.doctorCode}
+                          pvCode={this.props.match.params.pvCode}/>
                     <Divider/>
                     <div style={{textAlign:"right"}}>
                         <Space>

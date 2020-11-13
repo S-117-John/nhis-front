@@ -613,7 +613,7 @@ class Home extends React.Component {
                                 <Col span={12}>
                                     <div>
                                         <Link
-                                            to={"/medicalAdviceSearch/" + this.props.match.params.hosId + "/" + this.props.match.params.doctorCode + "/" + this.props.match.params.currentDeptCode}>
+                                            to={"/medicalAdviceSearch/" + this.props.match.params.hosId + "/" + this.props.match.params.doctorCode + "/" + this.props.match.params.currentDeptCode+"/"+this.props.match.params.pvCode}>
                                             <Button
                                                 disabled={this.state.isDisabled}
                                                 type="primary" style={{marginLeft: 20}}><PlusOutlined/>
